@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+
+<html>
+<head>
+	<title>Untitled</title>
+	<script language="JavaScript">
+	<!--
+	function getSpeed(){
+	document.forms[0].elements[0].value=top.score.speed
+	}
+	//-->
+	</script>
+</head>
+
+
+
+<body bgcolor="black" text="white" onLoad="getSpeed()" link="yellow" vlink="yellow" alink="red">
+<center>
+<font face="verdana, arial, helvetica" size="2">
+<table width="600"><tr><td>
+<img src="graphics/pacmanr.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0">
+</td>
+<td><div align="center">
+<img src="graphics/logoB.jpg" width=322 height=110 alt="" border="0"></div><br><br></td>
+<td><div align="right"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pacmanl.gif" width=30 height=30 alt="" border="0"></div></td>
+</tr>
+<tr><td colspan="3">
+
+
+<center>
+<font face="verdana, arial, helvetica" size="2">
+<b>Edit game speed:</b></font><br><br>
+</td></tr></table>
+Note: This game was designed to be fast was initially set to run at maximum speed (1). This worked fine for a PII 450 or therabouts back in the day, but on faster computers I soon learned it was too much! A PIII 850 required a value of about 25. In short - the higher the value, the slower the game, I've set the default to 30. You can set it as fast or slow as you like!
+<pre>
+<form>
+Game Speed : <input type="text" size="3" value="">&nbsp; <input type="button" value="update speed" onClick="top.score.speed=document.forms[0].elements[0].value; alert ('GAME SPEED NOW SET TO ' + document.forms[0].elements[0].value)">
+</form>
+</pre>
+<a href="index1a.html">Return to game</a>
+</body>
+</html>

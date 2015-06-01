@@ -1,0 +1,159 @@
+<html>
+<head>
+	<title>Javascript Pacman</title>
+<META name="resource-type" content="document"> 
+<META name="distribution" content="GLOBAL"> 
+<META name="description" content="Super fast version of the '80s arcade classic written entirely in Javascript - no plugins required!">
+<META name="copyright" content="Matt Platts 2000">
+<META name="keywords" content="pacman javascript game games dhtml arcade action fast speed fun frantic chaos object orientated programming what an odd collection of words this is">
+<META NAME="author" content="Matt Platts">
+<META HTTP-EQUIV="content-type:" content="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="content-language" content="en">
+	<script language="JavaScript">
+	<!--
+	
+	loadFirst = new Image
+	loadFirst.src = 'graphics/logoB.jpg'
+	
+	home1 = new Image
+	home1.src='graphics/maze1.gif'
+	home2 = new Image
+	home2.src='graphics/ghost5.gif'
+	home3 = new Image
+	home3.src='graphics/ghost6.gif'
+	home4 = new Image
+	home4.src='graphics/maze2.gif'
+	home5 = new Image
+	home5.src='graphics/blank.gif'
+	home6 = new Image
+	home6 = 'graphics/pil.gif'
+	home7 = new Image
+	home7.src = 'graphics/powerpill.gif'
+	home8 = new Image
+	home8.src = 'graphics/cherry.jpg'
+	home9 = new Image
+	home9.src = 'graphics/strawberry.jpg'
+	home10 = new Image
+	home10.src = 'graphics/maze3.gif'
+	home11 = new Image
+	home11.src = 'graphics/maze4.gif'
+	home12 = new Image
+	home12.src = 'graphics/maze5.gif'
+	home13 = new Image
+	home13.src = 'graphics/maze1inv.gif'
+	home14 = new Image
+	home14.src = 'graphics/maze2inv.gif'
+	home15 = new Image
+	home15.src = 'graphics/maze3inv.gif'
+	home16 = new Image
+	home16.src = 'graphics/maze4inv.gif'
+	home17 = new Image
+	home17.src = 'graphics/maze5inv.gif'
+
+
+pmanL = new Image
+pmanL.src = 'graphics/pacmanl.gif'
+pmanR = new Image
+pmanR.src = 'graphics/pacmanr.gif'
+pmanU = new Image
+pmanU.src = 'graphics/pacmanu.gif'
+pmanD = new Image
+pmanD.src = 'graphics/pacmand.gif'
+
+
+top.main.document.focus()
+
+
+function kd(){
+key = window.event.keyCode
+if (key=="90" || key=="122"){
+location='pacman_1.html'
+//window.open("pacman_1.html","pacwindow","status,width=585,height=500")
+}
+if (key=="88" || key=="120"){
+location="settings.html";
+}
+}
+
+
+function init(){
+ns=(navigator.appName.indexOf('Netscape')>=0)? true:false
+if (ns) {
+	document.captureEvents(Event.KEYDOWN);
+	document.onkeydown=kdns
+	document.maintext.visibility='show'; document.loading.visibility='hide'
+} else {
+document.all.maintext.style.visibility='visible'; document.all.loading.style.visibility='hidden'
+}
+}
+
+
+function kdns(evt){
+key=evt.which
+if (key=="90" || key=="122") {
+location='pacman_1.html'
+}
+if (key=="88" || key=="120"){
+location="settings.html";
+}
+}
+
+
+
+
+function setspeed(){
+myspeed = document.forms[0].elements[0].value
+top.score.speed = myspeed
+alert ("Speed changed to " + myspeed)
+}
+
+
+//-->
+	</script>
+	
+	<style type="text/css">
+	#loading {position:relative; top:-50; width:400; visibility:visible; background-color:green}
+	#maintext {position:relative; visibility:hidden}
+	</style>
+</head>
+
+
+<body bgcolor="000000" text="white" link="yellow" alink="yellow" vlink="yellow" onKeyDown="kd()" onload="location='index2a.html'">
+<br><br><br><br>
+<center>
+<font face="verdana, arial, helvetica" size="2">
+<table width="700"><tr><td>
+<img src="graphics/pacmanr.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0">
+</td>
+<td><div align="center">
+<img src="graphics/logoB.jpg" width=322 height=110 alt="" border="0"></div><br><br></td>
+<td><div align="right"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pacmanl.gif" width=30 height=30 alt="" border="0"></div></td>
+</tr>
+</table>
+<center><b>8</b>0's <b>A</b>rcade game <b>A</b>ction for your web browser...</b></center>
+
+
+
+
+<div id="loading">
+<center>
+<marquee>
+pre-loading graphics... please wait a minute or so..
+</marquee>
+</center>
+</div>
+<ul>
+<li>This version supports Internet Explorer 4+, Netscape Communicator 4, Netscape 6, Firefox and Google Chrome.
+</ul>
+<center><font color="yellow"><b>NEW FEATURES</b></font></center>
+<ul>
+<li>Five Screens
+<li>Game Speed Selector
+<li>Intelligent Ghosts
+</ul>
+<p><center>Pre-loading images - please wait a few moments</center></p>
+</font>
+
+</center>
+</body>
+</html>

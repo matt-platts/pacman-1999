@@ -1,0 +1,164 @@
+<html>
+<head>
+	<title>Pacman</title>
+<META name="resource-type" content="document"> 
+<META name="distribution" content="GLOBAL"> 
+<META name="description" content="Super fast version of the '80s arcade classic written entirely in Javascript - no plugins required!">
+<META name="copyright" content="Matt Platts 2000">
+<META name="keywords" content="pacman javascript game games dhtml arcade action fast speed fun frantic chaos object orientated programming what an odd collection of words this is">
+<META NAME="author" content="Matt Platts">
+<META HTTP-EQUIV="Reply-To" content="matt@javascript-pacman.com">
+<META HTTP-EQUIV="content-type:" content="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="content-language" content="en">
+	<script language="JavaScript">
+	<!--
+window.focus()
+function kd(){
+key = window.event.keyCode
+if (key=="90" || key=="122"){
+location='pacman_1.html'
+//window.open("pacman_1.html","pacwindow","status,width=585,height=500")
+}
+if (key=="89" || key=="121"){
+location='pacman_1_fast.html'
+//window.open("pacman_1.html","pacwindow","status,width=585,height=500")
+}
+if (key=="88" || key=="120"){
+location="settings.html";
+}
+}
+
+
+function init(){
+ns=(navigator.appName.indexOf('Netscape')>=0)? true:false
+if (ns) {
+	document.captureEvents(Event.KEYDOWN);
+	document.onkeydown=kdns
+	document.maintext.visibility='show'; document.loading.visibility='hide'
+} else {
+document.all.maintext.style.visibility='visible'; document.all.loading.style.visibility='hidden'
+}
+}
+
+
+function kdns(evt){
+key=evt.which
+if (key=="90" || key=="122") {
+location='pacman_1.html'
+}
+if (key=="89" || key=="121") {
+location='pacman_1_fast.html'
+}
+if (key=="88" || key=="120"){
+location="settings.html";
+}
+
+
+}
+
+
+
+
+function setspeed(){
+myspeed = document.forms[0].elements[0].value
+top.score.speed = myspeed
+alert ("Speed changed to " + myspeed)
+}
+
+
+//-->
+	</script>
+	
+	<style type="text/css">
+	#loading {position:relative; top:-30; width:400; visibility:visible; background-color:green}
+	#maintext {position:relative; visibility:visible}
+	.dropdown {width:100px; height:19px; font-family:verdana, arial, helvetica; font-size:12px; color:orange; background-color:#660066}
+.tablestyle {color:white; font-size:12px; font-family:verdana, arial, helvetica; background-color:000033}
+	</style>
+</head>
+
+
+<body bgcolor="000000" text="white" link="yellow" alink="yellow" vlink="yellow" onKeyDown="kd()">
+<center>
+<font face="verdana, arial, helvetica" size="2">
+<table width="700"><tr><td>
+<img src="graphics/pacmanr.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0">
+</td>
+<td><div align="center">
+<img src="graphics/logoB.jpg" width=322 height=110 alt="" border="0"></div><br><br></td>
+<td><div align="right"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pacmanl.gif" width=30 height=30 alt="" border="0"></div></td>
+</tr>
+</table>
+<div id="loading">
+<center><b>8</b>0's <b>A</b>rcade game <b>A</b>ction for your web browser...</b></center>
+</div>
+
+
+<table>
+<tr><td colspan="3">
+
+
+<center>
+<font face="verdana, arial, helvetica" size="2">
+
+
+<div id="maintext">
+
+
+<center>
+<font face="verdana, arial, helvetica" size="2">
+<b>Rules &amp; Scoring</b></center>
+<ul>
+Points are scored as follows:<br /><br />
+<table class="tablestyle">
+<tr>
+	<td align="center"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"></td>
+	<td>10</td>
+</tr>
+<tr>
+	<td align="center"><img src="graphics/powerpil.gif" width=30 height=30 alt="" border="0"></td>
+	<td>10</td>
+</tr>
+<tr>
+	<td align="center"><img src="graphics/ghost4.gif" width=30 height=30 alt="" border="0"><img src="graphics/ghost3.gif" width=30 height=30 alt="" border="0"><img src="graphics/ghost2.gif" width=30 height=30 alt="" border="0"><img src="graphics/ghost1.gif" width=30 height=30 alt="" border="0"></td>
+	<td>50, 100, 150, 200*</td>
+</tr>
+<tr>
+	<td align="center"><img src="graphics/cherry.jpg" width=23 height=23 alt="" border="0"> or <img src="graphics/strawberry.jpg" width=23 height=23 alt="" border="0"></td>
+	<td>250</td>
+</tr>
+
+
+</table>
+<br />
+
+* The amount you get for a ghost increases by 50 for each ghost you eat on that powerpill. The amount starts at 50 each time a new powerpill is eaten.
+<p>Each time you lose a life you will additionally <i>lose</i> 50 points.
+<br>
+<p>In addition, extra lives are granted at 5000 and 10000 points.
+<p><a href="pacman_1.html">START</a> | <a href="index2a.html">BACK</a><br>
+
+
+<br><br>
+
+
+<img src="graphics/ghost1.gif" width=30 height=30 alt="" border="0">
+<img src="graphics/ghost2.gif" width=30 height=30 alt="" border="0">
+<img src="graphics/ghost3.gif" width=30 height=30 alt="" border="0">
+<img src="graphics/ghost4.gif" width=30 height=30 alt="" border="0">
+<br><br>
+</font>
+<hr size="2" color="#6600ff" width="60%">
+
+
+<br><br>
+</center>
+</div>
+
+
+</font>
+
+
+</center>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<html>
+<head>
+<title>Pacman</title>
+<META name="resource-type" content="document"> 
+<META name="distribution" content="GLOBAL"> 
+<META name="description" content="Super fast version of the '80s arcade classic written entirely in Javascript - no plugins required!">
+<META name="copyright" content="Matt Platts">
+<META name="keywords" content="pacman javascript game games dhtml arcade action fast speed fun frantic chaos object orientated programming what an odd collection of words this is">
+<META NAME="author" content="Matt Platts">
+<META HTTP-EQUIV="content-type:" content="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="content-language" content="en">
+	<script language="JavaScript">
+	<!--
+top.main.document.focus();
+function kd(e){
+if (document.all && !document.getElementById){key = window.event.keyCode}
+if (document.getElementById){ key = e.keyCode}
+if (key=="90" || key=="122"){
+location='pacman_1.html'
+//window.open("pacman_1.html","pacwindow","status,width=585,height=500")
+}
+if (key=="89" || key=="121"){
+location='pacman_1_fast.html'
+//window.open("pacman_1.html","pacwindow","status,width=585,height=500")
+}
+if (key=="88" || key=="120"){
+location="settings.html";
+}
+}
+
+function init(){
+ns=(navigator.appName.indexOf('Netscape')>=0)? true:false
+if (ns) {
+	document.captureEvents(Event.KEYDOWN);
+	document.onkeydown=kdns
+	document.maintext.visibility='show'; document.loading.visibility='hide'
+} else {
+document.all.maintext.style.visibility='visible'; document.all.loading.style.visibility='hidden'
+}
+}
+
+function kdns(evt){
+key=evt.which
+if (key=="90" || key=="122") {
+location='pacman_1.html'
+}
+if (key=="89" || key=="121") {
+location='pacman_1_fast.html'
+}
+if (key=="88" || key=="120"){
+location="settings.html";
+}
+
+}
+
+function setspeed(){
+myspeed = document.forms[0].elements[0].value
+top.score.speed = myspeed
+alert ("Speed changed to " + myspeed)
+}
+
+
+//-->
+	</script>
+	
+	<style type="text/css">
+	body {border:0; margin: 0px auto; padding:0px;}
+	#loading {position:relative; top:0; width:400; visibility:visible; background-color:green}
+	#maintext {position:relative; visibility:visible}
+	.dropdown {width:100px; height:19px; font-family:verdana, arial, helvetica; font-size:12px; color:orange; background-color:#660066}
+	</style>
+</head>
+
+
+<body bgcolor="000000" text="white" link="yellow" alink="yellow" vlink="yellow" onLoad="top.main.document.focus()" onKeyDown="kd(event)">
+<center>
+<font face="verdana, arial, helvetica" size="2">
+<table width="700"><tr><td>
+<img src="graphics/pacmanr.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0">
+</td>
+<td><div align="center">
+<img src="graphics/logoB.jpg" width=322 height=110 alt="" border="0"></div>
+<br /><font size='2'>
+<center>by Matt Platts</center></font></td>
+<td><div align="right"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pacmanl.gif" width=30 height=30 alt="" border="0"></div></td>
+</tr>
+</table>
+<br />
+<div id="loading">
+<center><b>8</b>0's <b>A</b>rcade game <b>A</b>ction for your web browser...</b></center>
+</div>
+<!--
+<font color='red'>Originally written for Internet Explorer and Netscape Communicator 4 / Netscape 6</font>
+<br /><br />
+<font color='lime'>Updated in 2009 to run in <strong>Firefox</strong>, <strong>IE </strong>and <strong>Google Chrome</strong>!!</font>
+<br />
+//-->
+<br />
+
+<table width="800">
+<tr><td colspan="3">
+
+<center>
+<font face="verdana, arial, helvetica" size="2" color="cyan">
+	<script language="Javascript">
+		if (location.search){
+			document.write("Your " + location.search.substr(1));
+			}
+	</script>
+</font><font face="verdana, arial, helvetica" size="2">
+<hr size="2" color="#6600ff" width="500">
+
+<div style="width:500px; font-family:courier; font-size:13px">
+	Not a faithful reproduction, just a bit of fun demonstrating what you can do with a few lines of javascript (well about 500 in fact). Enjoy :) 
+<br />
+	<br />
+<p style="font-size:12px; padding-top:1px; margin-top:1px;"> <img src="graphics/cherry.gif"> <a href="pacman_1.html"><b>CLICK HERE TO START OR SEE BELOW FOR INSTRUCTIONS</b></a> <img src="graphics/cherry.gif"></p>
+<hr size="2" color="#6600ff" width="500">
+<div id="maintext">
+Keys:<br>
+<table><tr><td>
+<font size="3">
+<pre>
+  A - UP
+  Z - DOWN
+  N - LEFT
+  M - RIGHT
+</pre>
+</font>
+</td></tr></table>
+Or use the arrow keys
+<hr size="2" color="#6600ff" width="500">
+<ul>
+Points are scored as follows:<br /><br />
+<table class="tablestyle">
+<tr>
+	<td align="center"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"></td>
+	<td>10</td>
+</tr>
+<tr>
+	<td align="center"><img src="graphics/powerpil.gif" width=30 height=30 alt="" border="0"></td>
+	<td>10</td>
+</tr>
+<tr>
+	<td align="center"><img src="graphics/ghost4.gif" width=30 height=30 alt="" border="0"><img src="graphics/ghost3.gif" width=30 height=30 alt="" border="0"><img src="graphics/ghost2.gif" width=30 height=30 alt="" border="0"><img src="graphics/ghost1.gif" width=30 height=30 alt="" border="0"></td>
+	<td>50, 100, 150, 200*</td>
+</tr>
+<tr>
+	<td align="center"><img src="graphics/cherry.jpg" width=23 height=23 alt="" border="0"> or <img src="graphics/strawberry.jpg" width=23 height=23 alt="" border="0"></td>
+	<td>250</td>
+</tr>
+
+
+</table>
+<br />
+
+* The amount you get for a ghost increases by 50 for each ghost you eat on that powerpill. The amount starts at 50 each time a new powerpill is eaten.
+<p>Each time you lose a life you will additionally <i>lose</i> 50 points.
+<br>
+<p>In addition, extra lives are granted at 5000 and 10000 points.
+<br>
+
+<hr size="2" color="#6600ff" width="500">
+<p><a href="settings.html">!! SET GAME SPEED !!</a>
+<!--<p><a href="tutorial/index.html">About this game and Javascript Tutorial -<br>how the game is written!</a>//-->
+<p><a href="pacman_1.html"><b>START</b></a><br>
+
+	<div style="background-color:#6600ff; color:white"><marquee><b>2009 Update!!</b></marquee></div>
+	<br />
+	This game was written originally for Internet Explorer 4, and Netscape Communicator 4 in 1998/1999! I discovered recently it still runs in Internet Explorer later versions, and I updated the code to run in Firefox and Google Chrome. I have tested this version in Firefox, Chrome and IE6 only so Im not sure what other browsers it still supports. That said, I've dug this version out from an old computer and I don't think this was the final one that ran in Netscape anyway as it goes. I remember one small bug in that browser that I did fix, and Im pretty sure this isn't the fixed version. But who knows.<br /><br />
+    I've also made a few code changes - got rid of the 'alert' dialogue boxes when you lose a life and replaced them with some pop ups which look better. <br /><br /> 
+<b>Bugs and Known Oddities:</b> Yes there are a couple. Firefox doesn't seem to be able to refresh the screen fast enough and occasionally halts for a split second before catching up. And once in a blue moon, you can pass through a ghost. Will look at this at some point.
+	
+	<br /><br />
+</div>
+
+<hr size="2" color="#6600ff" width="500">
+<div id="maintext">
+
+<img src="graphics/ghost1.gif" width=30 height=30 alt="" border="0">
+<img src="graphics/ghost2.gif" width=30 height=30 alt="" border="0">
+<img src="graphics/ghost3.gif" width=30 height=30 alt="" border="0">
+<img src="graphics/ghost4.gif" width=30 height=30 alt="" border="0">
+<br><br>
+
+</font>
+<hr size="2" color="#6600ff" width="60%">
+<font size="1">All code &copy Matt Platts 1998-2009. Graphics and idea blatantly yet (respectfully) ripped off from Namco. <a href="mailto:mattplatts@gmail.com">mattplatts@gmail.com</a>
+	<br>
+<hr size="2" color="#6600ff" width="60%">
+	<br>
+</center>
+</div>
+
+</font>
+
+</center>
+</body>
+</html>

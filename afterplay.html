@@ -1,0 +1,93 @@
+<html>
+<head>
+	<title>Pacman</title>
+<META name="resource-type" content="document"> 
+<META name="distribution" content="GLOBAL"> 
+<META name="description" content="Interpretation of the '80s arcade classic written entirely in Javascript / DHTML!">
+<META name="copyright" content="Matt Platts 2000">
+<META name="keywords" content="pacman javascript game games dhtml arcade action fast speed fun frantic chaos object orientated programming what an odd collection of words this is">
+<META NAME="author" content="Matt Platts">
+<META HTTP-EQUIV="Reply-To" content="mattplatts@gmail.com">
+<META HTTP-EQUIV="content-type:" content="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="content-language" content="en">
+	<script language="JavaScript">
+	<!--
+
+top.main.document.focus()
+
+function kd(){
+key = window.event.keyCode
+if (key=="90" || key=="122"){
+location='pacman_1.html'
+//window.open("pacman_1.html","pacwindow","status,width=585,height=500")
+}
+if (key=="89" || key=="121"){
+location='pacman_1_fast.html'
+//window.open("pacman_1.html","pacwindow","status,width=585,height=500")
+}
+if (key=="88" || key=="120"){
+location="settings.html";
+}
+}
+
+function init(){
+ns=(navigator.appName.indexOf('Netscape')>=0)? true:false
+if (ns) {
+	document.captureEvents(Event.KEYDOWN);
+	document.onkeydown=kdns
+	document.maintext.visibility='show'; document.loading.visibility='hide'
+} else {
+document.all.maintext.style.visibility='visible'; document.all.loading.style.visibility='hidden'
+}
+}
+
+function kdns(evt){
+key=evt.which
+if (key=="90" || key=="122") {
+location='pacman_1.html'
+}
+if (key=="89" || key=="121") {
+location='pacman_1_fast.html'
+}
+if (key=="88" || key=="120"){
+location="settings.html";
+}
+}
+
+function setspeed(){
+myspeed = document.forms[0].elements[0].value
+top.score.speed = myspeed
+alert ("Speed changed to " + myspeed)
+}
+
+function sendset(){
+document.forms[0].elements[0].value=top.score.score
+//document.write("<b>Your final score was " + top.score.score + ".<br /><a href=\"index2a.html\">Continue</a>");
+document.forms[0].submit()
+
+with (top.score) {
+	level=1
+	lives=3
+	pillNumber=78
+	score=0
+}
+}
+
+//-->
+	</script>
+	
+	<style type="text/css">
+	#loading {position:relative; top:-30; width:400; visibility:visible; background-color:green}
+	#maintext {position:relative; visibility:visible}
+	.dropdown {width:100px; height:19px; font-family:verdana, arial, helvetica; font-size:12px; color:orange; background-color:#660066}
+	</style>
+</head>
+
+<body bgcolor="000000" text="white" link="yellow" alink="yellow" vlink="yellow" onload="sendset()">
+	<!--<form action="http://www.cgi101.com/~mplatts/pacman/hiscore.cgi" method="post">//-->
+<form action="index2a.html" method="get">
+<input type='hidden' value='' name='score'>
+</form>
+
+</body>
+</html>
