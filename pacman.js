@@ -93,14 +93,14 @@ if (top.score.level==3 || top.score.level==4) offScreen=3
 
 function init(){
 
-if (!top.score){ 
-	top.score = new Object;
-	top.score.level=1;
-	top.score.mode="image";
-	top.score.speed=25;
-	offScreen="1";
-	speed=25;
- } 
+	if (!top.score){ /* have loaded without the frameset - use for debugging only */
+		top.score = new Object;
+		top.score.level=1;
+		top.score.mode="image";
+		top.score.speed=25;
+		offScreen="1";
+		speed=25;
+	 } 
 
 
 
@@ -265,7 +265,7 @@ function ghosts(){
 			lifeform.forms[0].elements[1].value -= 1
 			divMessage.visibility='visible'
 			onPause=1;
-			setTimeout('divMessage.visibility=\'hidden\'; onPause=0; tm = setTimeout("move()",speed); timer1 = setTimeout("ghosts()",speed)',1500);
+			setTimeout('divMessage.visibility=\'hidden\'; onPause=0; pacTimer = setTimeout("move()",speed); ghostsTimer = setTimeout("ghosts()",speed)',1500);
 				
 			 if (lives==0) {
 				 divMessageEnd.visibility='visible'
@@ -346,7 +346,7 @@ function ghosts(){
 		} 
 
 	}
-	if (!onPause){ timer1 = setTimeout("ghosts()",speed) }
+	if (!onPause){ ghostsTimer = setTimeout("ghosts()",speed) }
 }
 
 // for if ghost goes of screen through channel on first maze..
@@ -379,14 +379,37 @@ function offSideGhosts3(){
 
 // keydown = invoked if key pressed. First works out which key it is, and translates it to a direction. Four flags are present here - key, newkey, lastkey & movekey. If the key that is pressed (key) is not the same as the previously pressed key (newkey - it was last time round!), then the previously pressed key is stored in lastkey. Movekey is the current movement, and if it's not the same as the key just pressed (key) the value is stored in newkey, and the move function is called if a flag 'moving' is false. This will all make sense later - honest!
 function kd(e){
-	if (keycount>=2) {keycount=0; movekey="Q"; if (!moving) move()}
-	if (document.all && !document.getElementById){key = window.event.keyCode}
-	if (document.getElementById){ key = e.keyCode}
-	if (key=="65" || key=="97" || key == "38") {key="U"}
-	if (key=="90" || key=="122" || key == "40") {key="D"}
-	if (key=="78" || key=="110" || key == "37") {key="L"}
-	if (key=="77" || key=="109" || key == "39") {key="R"}
-	if (movekey != key) {newkey = key; if (!moving) move(); keycount++}
+
+	if (onPause){
+		onPause=0;
+		if (pacTimer){ clearTimeout(pacTimer);}
+		if (ghostsTimer){ clearTimeout(ghostsTimer);}
+		if (gameTimer){ clearTimeout(gameTimer);}
+
+		gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',1) 
+		//if (!ghostsTimer){ ghostsTimer = setTimeout("ghosts()",speed); }
+	} else {
+
+		if (keycount>=2) {keycount=0; movekey="Q"; if (!moving) move()}
+		if (document.all && !document.getElementById){key = window.event.keyCode}
+		if (document.getElementById){ key = e.keyCode}
+		if (key=="65" || key=="97" || key == "38") {key="U"}
+		if (key=="90" || key=="122" || key == "40") {key="D"}
+		if (key=="78" || key=="110" || key == "37") {key="L"}
+		if (key=="77" || key=="109" || key == "39") {key="R"}
+
+		if (key=="80" || key=="112"){ 
+			if (!onPause){ 
+				onPause=1; 
+				if (pacTimer){ clearTimeout(pacTimer);}
+				if (ghostsTimer){ clearTimeout(ghostsTimer);}
+				if (gameTimer){ clearTimeout(gameTimer);}
+			}
+			
+		} else {
+			if (movekey != key) {newkey = key; if (!moving) move(); keycount++}
+		}
+	}
 }
 
 // netscape version of above.
@@ -398,7 +421,12 @@ function kdns(evt){
 	if (key=="90" || key=="122" || key == "40") {key="D"}
 	if (key=="78" || key=="110" || key == "37") {key="L"}
 	if (key=="77" || key=="109" || key == "39") {key="R"}
-	if (movekey != key) {newkey = key; if (!moving) move(); keycount++}
+
+	if (key=="80" || key=="112"){ onPause=1; 
+		alert("pause");
+	} else {
+		if (movekey != key) {newkey = key; if (!moving) move(); keycount++}
+	}
 }
 
 //decreases keycount by one as a key goes up
@@ -518,7 +546,7 @@ function move(){
 	}
 	moving = true
 	if (!won && !onPause){
-		tm = setTimeout("move()",speed)
+		pacTimer = setTimeout("move()",speed)
 	}
 	}
 }
@@ -646,7 +674,7 @@ function gameEnd(){
 }
 
 function start(){
-	setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',1500) 
+	gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',1500) 
 }
 
 function renderGrid(){
