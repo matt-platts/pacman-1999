@@ -1,14 +1,15 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
 <html>
 <head>
-	<title>Javascript Pacman</title>
-<META name="resource-type" content="document"> 
-<META name="distribution" content="GLOBAL"> 
-<META name="description" content="Super fast version of the '80s arcade classic written entirely in Javascript - no plugins required!">
-<META name="copyright" content="Matt Platts 2000">
-<META name="keywords" content="pacman javascript game games dhtml arcade action fast speed fun frantic chaos object orientated programming what an odd collection of words this is">
-<META NAME="author" content="Matt Platts">
-<META HTTP-EQUIV="content-type:" content="text/html; charset=ISO-8859-1">
-<META HTTP-EQUIV="content-language" content="en">
+	<title>Javascript Pacman by Matt Platts.</title>
+	<meta name="resource-type" content="document"> 
+	<meta name="distribution" content="GLOBAL"> 
+	<meta name="description" content="Super fast version of the '80s arcade classic written entirely in Javascript - no plugins required!">
+	<meta name="copyright" content="Matt Platts, 1999">
+	<meta name="keywords" content="pacman javascript game games dhtml arcade action fast speed fun frantic chaos object orientated programming what an odd collection of words this is">
+	<meta NAME="author" content="Matt Platts">
+	<meta HTTP-EQUIV="content-type:" content="text/html; charset=ISO-8859-1">
+	<meta HTTP-EQUIV="content-language" content="en">
 	<script language="JavaScript">
 	<!--
 	
@@ -51,109 +52,103 @@
 	home17.src = 'graphics/maze5inv.gif'
 
 
-pmanL = new Image
-pmanL.src = 'graphics/pacmanl.gif'
-pmanR = new Image
-pmanR.src = 'graphics/pacmanr.gif'
-pmanU = new Image
-pmanU.src = 'graphics/pacmanu.gif'
-pmanD = new Image
-pmanD.src = 'graphics/pacmand.gif'
+	pmanL = new Image
+	pmanL.src = 'graphics/pacmanl.gif'
+	pmanR = new Image
+	pmanR.src = 'graphics/pacmanr.gif'
+	pmanU = new Image
+	pmanU.src = 'graphics/pacmanu.gif'
+	pmanD = new Image
+	pmanD.src = 'graphics/pacmand.gif'
 
 
-top.main.document.focus()
+	//top.main.document.focus() // ensure key events are captured as we are in a frameset
 
 
-function kd(){
-key = window.event.keyCode
-if (key=="90" || key=="122"){
-location='pacman_1.html'
-//window.open("pacman_1.html","pacwindow","status,width=585,height=500")
-}
-if (key=="88" || key=="120"){
-location="settings.html";
-}
-}
+	function kd(){
+		key = window.event.keyCode;
+		if (key){
+			//window.open("pacman_1.html","pacwindow","status,width=585,height=500")
+			location="index2a.html";
+		}
+		/*
+		if (key=="90" || key=="122"){
+			window.open("pacman_1.html","pacwindow","status,width=585,height=500")
+		}
+		if (key=="88" || key=="120"){
+			location="settings.html";
+		}
+		*/
+	}
 
 
-function init(){
-ns=(navigator.appName.indexOf('Netscape')>=0)? true:false
-if (ns) {
-	document.captureEvents(Event.KEYDOWN);
-	document.onkeydown=kdns
-	document.maintext.visibility='show'; document.loading.visibility='hide'
-} else {
-document.all.maintext.style.visibility='visible'; document.all.loading.style.visibility='hidden'
-}
-}
+	function init(){
+		ns=(navigator.appName.indexOf('Netscape')>=0)? true:false
+		if (ns) {
+			document.captureEvents(Event.KEYDOWN);
+			document.onkeydown=kdns
+			document.maintext.visibility='show'; document.loading.visibility='hide'
+		} else {
+			document.all.maintext.style.visibility='visible'; document.all.loading.style.visibility='hidden'
+		}
+	}
 
 
-function kdns(evt){
-key=evt.which
-if (key=="90" || key=="122") {
-location='pacman_1.html'
-}
-if (key=="88" || key=="120"){
-location="settings.html";
-}
-}
+	function kdns(evt){
+		key=evt.which
+		if (key=="90" || key=="122") {
+			location='index2a.html'
+		}
+		if (key=="88" || key=="120"){
+			location="settings.html";
+		}
+	}
 
 
+	function setspeed(){
+		myspeed = document.forms[0].elements[0].value
+		top.score.speed = myspeed
+		alert ("Speed changed to " + myspeed)
+	}
 
 
-function setspeed(){
-myspeed = document.forms[0].elements[0].value
-top.score.speed = myspeed
-alert ("Speed changed to " + myspeed)
-}
-
-
-//-->
+	//-->
 	</script>
-	
+
 	<style type="text/css">
-	#loading {position:relative; top:-50; width:400; visibility:visible; background-color:green}
-	#maintext {position:relative; visibility:hidden}
+		#loading {position:relative; top:-50; width:400px; visibility:visible; background-color:green; margin-top:10px; padding-bottom:2px;}
+		#maintext {position:relative; visibility:hidden}
 	</style>
 </head>
 
 
 <body bgcolor="000000" text="white" link="yellow" alink="yellow" vlink="yellow" onKeyDown="kd()" onload="location='index2a.html'">
-<br><br><br><br>
-<center>
-<font face="verdana, arial, helvetica" size="2">
-<table width="700"><tr><td>
-<img src="graphics/pacmanr.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0">
-</td>
-<td><div align="center">
-<img src="graphics/logoB.jpg" width=322 height=110 alt="" border="0"></div><br><br></td>
-<td><div align="right"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pacmanl.gif" width=30 height=30 alt="" border="0"></div></td>
-</tr>
-</table>
-<center><b>8</b>0's <b>A</b>rcade game <b>A</b>ction for your web browser...</b></center>
+	<br><br><br><br>
+	<center>
+	<font face="verdana, arial, helvetica" size="2">
+	<table width="600"><tr><td>
+	<img src="graphics/pacmanr.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0">
+	</td>
+	<td><div align="center">
+	<img src="graphics/logoB.jpg" width=322 height=110 alt="" border="0"></div><br><br></td>
+	<td><div align="right"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pil.gif" width=30 height=30 alt="" border="0"><img src="graphics/pacmanl.gif" width=30 height=30 alt="" border="0"></div></td>
+	</tr>
+	</table>
+	<center><b>8</b>0's <b>A</b>rcade game <b>A</b>ction for your web browser...</b></center>
 
+	<div id="loading">
+	<center>
+	<marquee>
+		Pre-loading graphics... please wait..
+	</marquee>
+	</center>
+	</div>
+	<ul>
+	<li style="list-style-type:none">This version supports Internet Explorer 4+, Netscape Communicator 4, Netscape 6, Firefox and Google Chrome.
+	</ul>	<br /><br />
+	<p>&copy; Matt Platts 1999.
+	</font>
 
-
-
-<div id="loading">
-<center>
-<marquee>
-pre-loading graphics... please wait a minute or so..
-</marquee>
-</center>
-</div>
-<ul>
-<li>This version supports Internet Explorer 4+, Netscape Communicator 4, Netscape 6, Firefox and Google Chrome.
-</ul>
-<center><font color="yellow"><b>NEW FEATURES</b></font></center>
-<ul>
-<li>Five Screens
-<li>Game Speed Selector
-<li>Intelligent Ghosts
-</ul>
-<p><center>Pre-loading images - please wait a few moments</center></p>
-</font>
-
-</center>
+	</center>
 </body>
 </html>

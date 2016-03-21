@@ -1,6 +1,16 @@
 // pacman.js
 // by Matt Platts, 1999-2000. Updated for Netscape 6, June 2001.
 
+if (!top.score){ 
+	top.score = new Object;
+	top.score.level=1;
+	top.score.mode="image";
+	top.score.speed=25;
+	offScreen="1";
+	speed=25;
+ } 
+
+
 if (document.all){top.main.document.focus();}
 
 // set main variables / images
@@ -83,6 +93,17 @@ if (top.score.level==3 || top.score.level==4) offScreen=3
 
 function init(){
 
+if (!top.score){ 
+	top.score = new Object;
+	top.score.level=1;
+	top.score.mode="image";
+	top.score.speed=25;
+	offScreen="1";
+	speed=25;
+ } 
+
+
+
 	if (document.all){top.main.document.focus();}
 	ns=(navigator.appName.indexOf('Netscape')>=0)? true:false
 	n6=(document.getElementById && !document.all)? true:false
@@ -134,9 +155,11 @@ function init(){
 	vulnerable = new Array (true, true, true, true)
 	onPath = new Array (false, false, false, false)
 
-	if (top.score.level>=2){
-		scoreform.forms[0].elements[0].value = top.score.score
-		lifeform.forms[0].elements[1].value = top.score.lives
+	if (top.score){
+		if (top.score.level>=2){
+			scoreform.forms[0].elements[0].value = top.score.score
+			lifeform.forms[0].elements[1].value = top.score.lives
+		}
 	}
 
 	ghostDir = new Array
@@ -624,4 +647,131 @@ function gameEnd(){
 
 function start(){
 	setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',1500) 
+}
+
+function renderGrid(){
+
+if (!top.score){ 
+	top.score = new Object;
+	top.score.level=1;
+	top.score.mode="image";
+	top.score.speed=25;
+	offScreen="1";
+	speed=25;
+ } 
+
+
+	if (top.score){
+		mode = top.score.mode;
+	} else {
+		mode = "image";
+	}
+	if (mode=="css"){
+		document.images['maze'].style.display="none";
+		document.getElementById('maze').innerHTML += "<div id='mazeinner'></div>";
+	}
+
+
+	for (i=25;i<386;i=(i+10)){
+		countZeros=0;
+		for (j=35;j<560;j=(j+10)){
+			ifpilthere = eval ("mazedata[i].left" + j)
+			if (ifpilthere !="0" && ifpilthere != undefined) { // this is if the whole string is not zero/undef
+
+				if (mode=="css"){
+					if (ifpilthere.charAt(4)=="1" || ifpilthere.charAt(4)=="2"){
+						element = eval("mazedata[" + i + "].left" + j);
+						elClass = element.substring(0,4); 
+						drawCell(i,j,elClass,'');
+						// if no D blocks before the next pill, insert a subcell to deal with the wall.
+						/// the subcell width should be same as the cell above (which is post-draw calculated, so do at that point, or second pass through the data!)
+						// 1. does the current cell bgo down?
+						console.log(element.charAt(1));
+						thisCell = "cell_" + i + "-" + j;
+						if (element.charAt(1)=="D"){
+							document.getElementById(thisCell).style.height="50px";
+							// cant go right?
+							if (element.charAt(0)=="U" && element.charAt(3)=="R"){
+								console.log("Up and Right!");
+								//document.getElementById(thisCell).className += " blockTopRightLowerRight";
+
+							} else if (element.charAt(1)=="D" && element.charAt(3)=="R"){
+								console.log("Down and Right!");
+								//document.getElementById(thisCell).className += " blockTopAndBottomRight";
+							} 
+
+							if (element.charAt(3)=="R"){
+								document.getElementById(thisCell).className += " blockLowerRight";
+								//document.getElementById(thisCell).className += " fillForwards";
+								//document.getElementById(thisCell).innerHTML="<div style='position:relative; left:30px; top:-1px; background-color:transparent; height:28px; border-top:1px blue solid; border-bottom:1px blue solid; width:20px;'></div>";
+							}
+							if (element.charAt(2)=="L"){
+								document.getElementById(thisCell).className += " blockLowerLeft";
+							}
+						}
+
+						// if it goes right
+						if (element.charAt(3)=="R"){
+							document.getElementById(thisCell).innerHTML="<div class='fillForwards'></div>";
+						}
+
+						if (countZeros){
+							console.log("Zeros: " + countZeros + " AT " + i + "," + j);
+							targetCell="cell_";
+							newTarget = j-(countZeros*10)-10;
+							targetCell = targetCell + i + "-" + newTarget;
+							console.log(i,j,countZeros, countZeros*10,targetCell,"j minus:", j-(countZeros*10));
+
+							// we should only track back as far as the wall - it may have been terminated for a gap in the wall in which case we don't need so long
+							// need to scan back to the position and see if it's already closed (blocked with no R)
+							lastCell = eval("mazedata[" + i + "].left" + newTarget);
+							console.log(lastCell);
+							if (lastCell.charAt(3) == "R"){
+								if (document.getElementById(targetCell)){
+									newWidth = (countZeros*10)+10 + "px";
+									document.getElementById(targetCell).style.width=newWidth;
+								}
+							} else {
+									console.log("R BLOCK - its " + lastCell.charAt(3));
+							}
+							countZeros=0;
+						}
+					}
+				}
+
+				// draw pills
+				if (ifpilthere.charAt(4)=="1") {
+					document.write("<div id='p" + j + i + "' style='position:absolute; background-color:transparent; left:" + j + "px; top:" + i + "px; z-Index:1'><img src='graphics/pil.gif' name='pil_" + j + i + "'></div>")
+				} else if (ifpilthere.charAt(4)=="2") {
+					document.write("<div id='p" + j + i + "' style='position:absolute; left:" + j + "px; top:" + i + "px; z-Index:1'><img src='graphics/powerpil.gif' name='pil_" + j + i + "'></div>")
+				} else {
+					// at this point there may or may not be a fourth character - if there is it should be 0, or entire string may be undefined (charAt will return 'f' from undeFined)
+					console.log("IFPILTHERE VALUES", ifpilthere.charAt(4), ifpilthere); 
+					//countZeros++;
+				}
+
+			} else {
+				countZeros++;
+			}
+		}
+	}
+}
+
+function drawSet(imaze){
+
+	document.getElementById("maze").innerHTML="";
+
+	for (j=25;j<386;j=(j+10)){
+		for (i=35;i<560;i=(i+10)){
+			element = eval("mazedata[" + j + "].left" + i);
+			elClass = element.substring(0,4); 
+			drawCell(j,i,elClass,'');
+		}
+	}
+
+}
+
+function drawCell(x,y,cellClass,content){
+	cellHTML = '<div id="cell_' + x + '-' + y + '" class="mazeCell ' + cellClass + '" style="position:absolute; top:' + x + 'px; left:' + y + 'px">' + content + '</div>';
+	document.getElementById("maze").innerHTML = document.getElementById("maze").innerHTML + cellHTML;
 }

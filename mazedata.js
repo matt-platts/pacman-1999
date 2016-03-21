@@ -1,10 +1,10 @@
 
 function set(zero,one,two,thr,fou,fiv,six,sev,eig,nin,ten,ele,twe,thi,fourteen,fif,sixteen,seventeen, eighteen,nineteen,twenty,twone,twtwo,twthr,twfou,twfiv,twsix,twsev,tweig,twnin,thty,thone,thtwo,ththr,thfou,thfiv,thsix,thsev,theig,thnin,forty,foone){
-k=0
-for (i=25;i<556;i=(i+10)){
-eval ("this.left" + i + "='" + set.arguments[k] + "'")
-k++
-}
+	k=0
+	for (i=25;i<556;i=(i+10)){
+		eval ("this.left" + i + "='" + set.arguments[k] + "'")
+		k++
+	}
 }
 
 mazedata = new Array()

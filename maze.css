@@ -1,0 +1,113 @@
+	.mazeCell {
+		width:28px;
+		height:28px;
+		background-color:#000;
+		overflow:none;
+		border:1px #000 solid;
+		color:#fff;
+		border-radius:2px;
+	}
+
+	.UDXX{ 
+		border-left:1px blue solid;
+		border-right:1px blue solid;
+	}
+	.XXLR {
+		border-top:1px blue solid;
+		border-bottom:1px blue solid;
+	}
+
+	.XXXR {
+		border-left:1px blue solid;
+		border-top:1px blue solid;
+		border-bottom:1px blue solid;
+	}
+	.XXLX {
+		border-right:1px blue solid;
+		border-top:1px blue solid;
+		border-bottom:1px blue solid;
+	}
+	.UXXX {
+		border-bottom:1px blue solid;
+		border-left:1px blue solid;
+		border-right:1px blue solid;
+	}
+	.XDXX {
+		border-top:1px blue solid;
+		border-left:1px blue solid;
+		border-right:1px blue solid;
+	}
+	.XDXR {
+		border-top:1px blue solid;
+		border-left:1px blue solid;
+	}
+	.XDLX {
+		border-top:1px blue solid;
+		border-right:1px blue solid;
+	}
+	.UXXR {
+		border-left:1px blue solid;
+		border-bottom:1px blue solid;
+	}
+	.UXLX {
+		border-bottom:1px blue solid;
+		border-right:1px blue solid;
+	}
+	.UXLR {
+		border-bottom:1px blue solid;
+	}
+	.XDLR {
+		border-top:1px blue solid;
+	}
+	.UDXR {
+		border-left:1px blue solid;
+	}
+	.UDLX {
+		border-right:1px blue solid;
+	}
+
+	.UDLR {
+
+	}
+
+	.blockLowerRight:after {
+			content:''; width:1px; height:20px; background:blue; position:absolute; right:0px; top:30px;
+	}
+
+	.blockLowerLeft:before {
+			content:''; width:1px; height:20px; background:blue; position:absolute; left:-1px; top:30px;
+	}
+
+	.blockTopRight:after {
+			content:''; width:20px; height:1px; background:blue; position:absolute; left:30px; top:-1px;
+	}
+	.blockTopRightLowerRight:after {
+			content:''; width:1px; height:20px; background:yellow; position:absolute; right:0px; top:30px;
+	}
+	.blockTopRightLowerRight:before {
+			content:''; width:20px; height:1px; background:red; position:absolute; left:30px; top:-1px;
+	}
+
+	.blockTAndBottomRight:after {
+	}
+	.blockTopAndBottomRight:before {
+			content:''; width:20px; height:1px; background:pink; position:absolute; left:30px; bottom:0px;
+	}
+
+	.fillForwards {
+		position:relative; left:30px; top:-1px; background-color:transparent; height:28px; border-top:1px blue solid; border-bottom:1px blue solid; width:20px;
+	}
+	.fillForwards_white {
+		 border-top:1px white solid; border-bottom:1px white solid;
+	}
+
+	#mazeinner {
+		border:1px blue solid;
+		border-radius:2px;
+		float:left;
+		width:520px;
+		height:405px;
+		padding:5px;
+		margin-top:10px;
+		margin-left:20px;
+	}

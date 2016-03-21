@@ -35,7 +35,12 @@
 Note: This game was designed to be fast was initially set to run at maximum speed (1). This worked fine for a PII 450 or therabouts back in the day, but on faster computers I soon learned it was too much! A PIII 850 required a value of about 25. In short - the higher the value, the slower the game, I've set the default to 30. You can set it as fast or slow as you like!
 <pre>
 <form>
-Game Speed : <input type="text" size="3" value="">&nbsp; <input type="button" value="update speed" onClick="top.score.speed=document.forms[0].elements[0].value; alert ('GAME SPEED NOW SET TO ' + document.forms[0].elements[0].value)">
+Game Speed : 
+<input type="text" size="3" value="">&nbsp; <input type="button" value="update speed" onClick="top.score.speed=document.forms[0].elements[0].value; alert ('GAME SPEED NOW SET TO ' + document.forms[0].elements[0].value)">
+<br />
+Maze image mode: (possible values - image or css)
+<input type="text" name="setmode" id="setmode" size="10" value="image">&nbsp; <input type="button" value="update mode" onClick="top.score.mode=document.forms[0].elements['setmode'].value; alert('Mode set to ' + document.forms[0].elements['setmode'].value)">
+
 </form>
 </pre>
 <a href="index1a.html">Return to game</a>
