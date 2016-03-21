@@ -381,12 +381,18 @@ function offSideGhosts3(){
 function kd(e){
 
 	if (onPause){
-		onPause=0;
+		//onPause=0;
 		if (pacTimer){ clearTimeout(pacTimer);}
 		if (ghostsTimer){ clearTimeout(ghostsTimer);}
 		if (gameTimer){ clearTimeout(gameTimer);}
 
-		gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',1) 
+		if (document.all && !document.getElementById){key = window.event.keyCode}
+		if (document.getElementById){ key = e.keyCode}
+		if (key == "80" || key == "112"){
+			onPause=0;
+			move(); ghosts();
+		}
+		//gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',speed) 
 		//if (!ghostsTimer){ ghostsTimer = setTimeout("ghosts()",speed); }
 	} else {
 
@@ -399,12 +405,10 @@ function kd(e){
 		if (key=="77" || key=="109" || key == "39") {key="R"}
 
 		if (key=="80" || key=="112"){ 
-			if (!onPause){ 
 				onPause=1; 
 				if (pacTimer){ clearTimeout(pacTimer);}
 				if (ghostsTimer){ clearTimeout(ghostsTimer);}
 				if (gameTimer){ clearTimeout(gameTimer);}
-			}
 			
 		} else {
 			if (movekey != key) {newkey = key; if (!moving) move(); keycount++}
