@@ -1,6 +1,13 @@
 // pacman.js
 // by Matt Platts, 1999-2000. Updated for Netscape 6, June 2001.
 
+
+// initial settings. these should be increased at around 10000 points?
+powerPillLifetime=140; // how many iterations the powerpill lasts for - hard is 120
+ghostBlinkLifetime=25; // how long the ghosts blink for within the power pill. Hard is 15.
+fruitLifetime=95; // how many iterations a piece of fruit stays on screen - hard is 80
+messageLifetime=1500; // millisecons for the duration of a message (life lost, get ready etc)
+
 if (!top.score){ 
 	top.score = new Object;
 	top.score.level=1;
@@ -71,15 +78,15 @@ fruitTimer=0
 speed=top.score.speed
 gameTime=top.score.gameTime
 if (top.score.level==2) {
-pacStartTop=285
-pacStartLeft=265
-ghostStartTop=165
-ghostStartLeft=275
+	pacStartTop=285
+	pacStartLeft=265
+	ghostStartTop=165
+	ghostStartLeft=275
 } else {
-pacStartTop=235
-pacStartLeft=265
-ghostStartTop=165
-ghostStartLeft=275
+	pacStartTop=235
+	pacStartLeft=265
+	ghostStartTop=165
+	ghostStartLeft=275
 }
 ghostscore=50
 nextfruitscore=score+600
@@ -89,8 +96,9 @@ if (top.score.level==1) offScreen=1
 if (top.score.level==2 || top.score.level==5) offScreen=2
 if (top.score.level==3 || top.score.level==4) offScreen=3
 
-// init() is called from onload, init() defines arrays for later use, then calls the ghosts() function and the move() funcion for the first time, to set them off. These functions then repeatedly call themselves on a timeout command (nb: move is also called from keydown events - we don't always want to wait!).
-
+/* Function: init
+ * Meta: init() is called from onload, init() defines arrays for later use, then calls the ghosts() function and the move() funcion for the first time, to set them off. These functions then repeatedly call themselves on a timeout command (nb: move is also called from keydown events - we don't want to wait!).
+*/
 function init(){
 
 	if (!top.score){ /* have loaded without the frameset - use for debugging only */
@@ -265,12 +273,12 @@ function ghosts(){
 			lifeform.forms[0].elements[1].value -= 1
 			divMessage.visibility='visible'
 			onPause=1;
-			setTimeout('divMessage.visibility=\'hidden\'; onPause=0; pacTimer = setTimeout("move()",speed); ghostsTimer = setTimeout("ghosts()",speed)',1500);
+			setTimeout('divMessage.visibility=\'hidden\'; onPause=0; pacTimer = setTimeout("move()",speed); ghostsTimer = setTimeout("ghosts()",speed)',messageLifetime);
 				
 			 if (lives==0) {
 				 divMessageEnd.visibility='visible'
 				 onPause=1;
-				 setTimeout('divMessageEnd.visibility=\'hidden\'; won=true; top.score.score=score; location="afterplay.html"',1500);
+				 setTimeout('divMessageEnd.visibility=\'hidden\'; won=true; top.score.score=score; location="afterplay.html"',messageLifetime);
 			} else {
 				reset()
 			} 
@@ -303,7 +311,7 @@ function ghosts(){
 
 	//change source of ghost images if powerpill nearly over.
 	if (ppTimer >="1") ppTimer=(ppTimer-1)
-	if (ppTimer == "15") {
+	if (ppTimer == ghostBlinkLifetime) {
 		for(i=0;i<4;i++){
 			if (!onPath[i]) {
 				if (vulnerable[i]) eval ("ghost" + i + "src.src = ghimg6.src")
@@ -399,21 +407,7 @@ function kd(e){
 		if (keycount>=2) {keycount=0; movekey="Q"; if (!moving) move()}
 		if (document.all && !document.getElementById){key = window.event.keyCode}
 		if (document.getElementById){ key = e.keyCode}
-		if (key=="65" || key=="97" || key == "38") {key="U"}
-		if (key=="90" || key=="122" || key == "40") {key="D"}
-		if (key=="78" || key=="110" || key == "37") {key="L"}
-		if (key=="77" || key=="109" || key == "39") {key="R"}
-
-		if (key=="82" || key=="114"){ top.location.reload();} // r = reset
-		if (key=="80" || key=="112"){
-				onPause=1; 
-				if (pacTimer){ clearTimeout(pacTimer);}
-				if (ghostsTimer){ clearTimeout(ghostsTimer);}
-				if (gameTimer){ clearTimeout(gameTimer);}
-			
-		} else {
-			if (movekey != key) {newkey = key; if (!moving) move(); keycount++}
-		}
+		keyLogic(key);
 	}
 }
 
@@ -422,19 +416,37 @@ function kdns(evt){
 	if (keycount>=2) {keycount=0; movekey="Q"; if (!moving) move()}
 	key = evt.which
 	//status = key
+	keyLogic(key);
+}
+	
+
+function keyLogic(key){
+
+	// movement kreys (aznm or cursor keys)
 	if (key=="65" || key=="97" || key == "38") {key="U"}
 	if (key=="90" || key=="122" || key == "40") {key="D"}
 	if (key=="78" || key=="110" || key == "37") {key="L"}
 	if (key=="77" || key=="109" || key == "39") {key="R"}
 
-	if (key=="80" || key=="112"){ onPause=1; 
-		alert("pause");
+	// game reste key (r)
+	if (key=="82" || key=="114"){ top.location.reload();} // r = reset
+	
+	// game pause key (p)
+	if (key=="80" || key=="112"){
+			onPause=1; 
+			if (pacTimer){ clearTimeout(pacTimer);}
+			if (ghostsTimer){ clearTimeout(ghostsTimer);}
+			if (gameTimer){ clearTimeout(gameTimer);}
+		
 	} else {
 		if (movekey != key) {newkey = key; if (!moving) move(); keycount++}
 	}
+
 }
 
-//decreases keycount by one as a key goes up
+/* Function : ku
+ * Meta: decreases keycount by one as a key goes up
+*/
 function ku(e){
 	keycount--;
 }
@@ -449,14 +461,16 @@ function move(){
 	r = possibilities.charAt(3)
 
 	if (newkey==u || newkey==d || newkey ==l || newkey == r) {
-		engage=true; movekey = newkey; lastkey = newkey // lastkey set to stop constant repetition of last 2 moves without the user touching anything.. see later on.
 
+		engage=true; movekey = newkey; lastkey = newkey // lastkey set to stop constant repetition of last 2 moves without the user touching anything.. see later on.
 		eval ("pacsource.src = pman" + movekey + ".src")
+
 	} else {
+
 		if (lastkey==u || lastkey==d || lastkey==l || lastkey==r) {
-		engage = true
-		movekey = lastkey
-		eval ("pacsource.src = pman" + movekey + ".src")
+			engage = true
+			movekey = lastkey
+			eval ("pacsource.src = pman" + movekey + ".src")
 		} else {
 			engage = false
 			moving = false
@@ -465,94 +479,95 @@ function move(){
 	//status = possibilities + "," + pacTop + "-" + pacLeft + "," + u + d + l + r + "- " + engage
 
 	if (engage) {
-	if (movekey==u) {divPacman.top=(pacTop-10); pacTop=pacTop-10}
-	if (movekey==d) {divPacman.top=(pacTop+10); pacTop=pacTop+10}
-	if (movekey==l) {divPacman.left=(pacLeft-10);pacLeft=pacLeft-10}
-	if (movekey==r) {divPacman.left=(pacLeft+10); pacLeft=pacLeft+10}
+
+		if (movekey==u) {divPacman.top=(pacTop-10); pacTop=pacTop-10}
+		if (movekey==d) {divPacman.top=(pacTop+10); pacTop=pacTop+10}
+		if (movekey==l) {divPacman.left=(pacLeft-10);pacLeft=pacLeft-10}
+		if (movekey==r) {divPacman.left=(pacLeft+10); pacLeft=pacLeft+10}
 
 
-	newleftamt = "left" + pacLeft
-	getnew = eval ("mazedata[pacTop].left" + pacLeft)
-	if (getnew.length>=5) { ifpil = getnew.charAt(4)} else {ifpil = 0}
-	if (ifpil=="1" || ifpil=="2") {
-	pb0 = getnew.charAt(0)
-	pb1 = getnew.charAt(1)
-	pb2 = getnew.charAt(2)
-	pb3 = getnew.charAt(3)
-	pb4 = "0"
-	if (getnew.length==6) {
-		pb5=getnew.charAt(5)
-		putback = eval ("pb0+pb1+pb2+pb3+pb4+pb5")
-		} else {
-		putback = eval ("pb0+pb1+pb2+pb3+pb4")
+		newleftamt = "left" + pacLeft
+		getnew = eval ("mazedata[pacTop].left" + pacLeft)
+		if (getnew.length>=5) { ifpil = getnew.charAt(4)} else {ifpil = 0}
+		if (ifpil=="1" || ifpil=="2") {
+			pb0 = getnew.charAt(0)
+			pb1 = getnew.charAt(1)
+			pb2 = getnew.charAt(2)
+			pb3 = getnew.charAt(3)
+			pb4 = "0"
+			if (getnew.length==6) {
+				pb5=getnew.charAt(5)
+				putback = eval ("pb0+pb1+pb2+pb3+pb4+pb5")
+				} else {
+				putback = eval ("pb0+pb1+pb2+pb3+pb4")
+				}
+			eval ("mazedata[pacTop]." + newleftamt + "= putback")
+			if (ns) pilsrc = eval("document.p" + pacLeft + pacTop + ".document")
+			eval("pilsrc.images.pil_" + pacLeft + pacTop + ".src = blank.src")
+			if (ifpil==2){
+				for(i=0;i<4;i++){
+					eval ("ghost" + i + "src.src=ghimg5.src")
+					ppTimer = powerPillLifetime 
+					powerpilon = true
+					vulnerable[i]=true
+					ghostscore=50
+				}
+			}
+			ifpil=0; pilcount++
+			score += (10)
+			scoreform.forms[0].elements[0].value = score
+			if (pilcount>=top.score.pillNumber) {
+				won = true
+				onPath[0]=true; onPath[1]=true; onPath[2]=true;onPath[3]=true;
+				pacsource.src=pmanW.src
+				gameEnd()
+
+			}
 		}
-	eval ("mazedata[pacTop]." + newleftamt + "= putback")
-	if (ns) pilsrc = eval("document.p" + pacLeft + pacTop + ".document")
-	eval("pilsrc.images.pil_" + pacLeft + pacTop + ".src = blank.src")
-	if (ifpil==2){
-	for(i=0;i<4;i++){
-	eval ("ghost" + i + "src.src=ghimg5.src")
-	ppTimer = 120
-	powerpilon = true
-	vulnerable[i]=true
-	ghostscore=50
-	}
-	}
-	ifpil=0; pilcount++
-	score += (10)
-	scoreform.forms[0].elements[0].value = score
-	if (pilcount>=top.score.pillNumber) {
-	won = true
-	onPath[0]=true; onPath[1]=true; onPath[2]=true;onPath[3]=true;
-	pacsource.src=pmanW.src
-	gameEnd()
 
-	}
-	}
+		if (score>=5000 && score <5500 && top.score.exlife1) {
+			lives++; top.score.lives++; scoreform.forms[0].elements[1].value = lives
+			top.score.exlife1=false
+		}
 
-	if (score>=5000 && score <5500 && top.score.exlife1) {
-		lives++; top.score.lives++; scoreform.forms[0].elements[1].value = lives
-		top.score.exlife1=false
-	}
+		if (score>=10000 && score <10500 && top.score.exlife2) {
+			lives++; top.score.lives++; scoreform.forms[0].elements[1].value = lives
+			top.score.exlife2=false
+		} 
 
-	if (score>=10000 && score <10500 && top.score.exlife2) {
-		lives++; top.score.lives++; scoreform.forms[0].elements[1].value = lives
-		top.score.exlife2=false
-	} 
+		//fruit stuff
+		if (score>=nextfruitscore && score <=nextfruitscore+300 && fruitArray[thisfruit]) {showfruit()}
+		if (fruitTimer>0) fruitTimer--
+		if (fruitTimer==1) {
+			divFruit.visibility='hidden'; fruitOn=false
+		}
+		//status= parseInt(divFruit.left) + "-" + pacLeft + "--" + parseInt(divFruit.top) + "-" + pacTop
 
-	//fruit stuff
-	if (score>=nextfruitscore && score <=nextfruitscore+300 && fruitArray[thisfruit]) {showfruit()}
-	if (fruitTimer>0) fruitTimer--
-	if (fruitTimer==1) {
-		divFruit.visibility='hidden'; fruitOn=false
-	}
-	//status= parseInt(divFruit.left) + "-" + pacLeft + "--" + parseInt(divFruit.top) + "-" + pacTop
+		if (pacLeft==parseInt(divFruit.left) && pacTop == parseInt(divFruit.top) && fruitOn) {
+			score=score+250; scoreform.forms[0].elements[0].value=score
+			fruitOn=false
+			divFruit.visibility='hidden'
+		}
 
-	if (pacLeft==parseInt(divFruit.left) && pacTop == parseInt(divFruit.top) && fruitOn) {
-		score=score+250; scoreform.forms[0].elements[0].value=score
-		fruitOn=false
-		divFruit.visibility='hidden'
-	}
-
-	// offside bit - if you go off the screen it puts you to the opposite side.
-	if (pacTop==175 && offScreen==1) {
-	if (pacLeft==25) {pacLeft = 505; divPacman.left=pacLeft}
-	if (pacLeft==515) {pacLeft= 35; divPacman.left=pacLeft}
-	}
-	if ((pacTop==25 && offScreen==2) || (pacTop==285 && offScreen==2)){
+		// offside bit - if you go off the screen it puts you to the opposite side.
+		if (pacTop==175 && offScreen==1) {
 		if (pacLeft==25) {pacLeft = 505; divPacman.left=pacLeft}
 		if (pacLeft==515) {pacLeft= 35; divPacman.left=pacLeft}
-	}
-	if (offScreen==3){
-		if (pacTop==285 || pacTop==125){
-		if (pacLeft==35) {pacLeft = 505; divPacman.left=pacLeft}
-		if (pacLeft==515) {pacLeft= 45; divPacman.left=pacLeft}
-	}
-	}
-	moving = true
-	if (!won && !onPause){
-		pacTimer = setTimeout("move()",speed)
-	}
+		}
+		if ((pacTop==25 && offScreen==2) || (pacTop==285 && offScreen==2)){
+			if (pacLeft==25) {pacLeft = 505; divPacman.left=pacLeft}
+			if (pacLeft==515) {pacLeft= 35; divPacman.left=pacLeft}
+		}
+		if (offScreen==3){
+			if (pacTop==285 || pacTop==125){
+			if (pacLeft==35) {pacLeft = 505; divPacman.left=pacLeft}
+			if (pacLeft==515) {pacLeft= 45; divPacman.left=pacLeft}
+		}
+		}
+		moving = true
+		if (!won && !onPause){
+			pacTimer = setTimeout("move()",speed)
+		}
 	}
 }
 
@@ -561,7 +576,7 @@ function showfruit() {
 	thisfruit++
 	fruitArray[thisfruit]=true
 	whichFruit = Math.round(Math.random() *1)
-	fruitTimer=80
+	fruitTimer=fruitLifetime
 	if (!fruitOn) eval ("fruitsource.src=berry" + whichFruit + ".src")
 	fruitOn=true
 	divFruit.visibility='visible'
@@ -576,15 +591,17 @@ function getGhostDir(who,howmany,possibilities){
 		}
 }
 
-//generates a random direction for a ghost, but not towards pacman (used for when a powerpill is active).
+// generates a random direction for a ghost, but not towards pacman (used for when a powerpill is active).
+// NB: The lack of checking whether or not the direction can be made is actually what slows down the ghosts when a pill is on and they are in your line of sight
+// Although not programatically brilliant, it worked for the game in an 'off label' kind of way, so it got left. 
 function getTrueDir(who,not){
-			ghostDir[wg] = Math.round(Math.random() *3)
-			if (ghostDir[wg] == "0") {ghostDir[wg] = "U"}
-			if (ghostDir[wg] == "1") {ghostDir[wg] = "D"}
-			if (ghostDir[wg] == "2") {ghostDir[wg] = "L"}
-			if (ghostDir[wg] == "3") {ghostDir[wg] = "R"}
-			if (ghostDir[wg] == not) {getTrueDir(wg,not)}
-					}
+	ghostDir[wg] = Math.round(Math.random() *3)
+	if (ghostDir[wg] == "0") {ghostDir[wg] = "U"}
+	if (ghostDir[wg] == "1") {ghostDir[wg] = "D"}
+	if (ghostDir[wg] == "2") {ghostDir[wg] = "L"}
+	if (ghostDir[wg] == "3") {ghostDir[wg] = "R"}
+	if (ghostDir[wg] == not) {getTrueDir(wg,not)}
+}
 
 //resets all positions, image sources and directions if a life is lost
 function reset(){
@@ -607,7 +624,10 @@ function reset(){
 	ghostscore=50
 }
 
-//just gives the ghosts a bit of thinking power. If there's a clear line between them and you, this function will change their direction to move towards you, unless a powerpill is active on them, in which case they go in any direction that is not towards you.  
+/* 
+  Function : intelligence 
+  Meta: Gives the ghosts a bit of thinking power. If there's a clear line between them and you, this function will change their direction to move towards you, unless a powerpill is active on them, in which case they go in any direction that is not towards you.  
+*/
 
 function intelligence(g){
 	//status=(wg + "-" + wg + "--" + pacTop)
@@ -679,19 +699,22 @@ function gameEnd(){
 }
 
 function start(){
-	gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',1500) 
+	gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',messageLifetime) 
 }
 
+/* Function :renderGrid
+ * Meta: used for the css maze generation only (not in the final version yet) 
+ */
 function renderGrid(){
 
-if (!top.score){ 
-	top.score = new Object;
-	top.score.level=1;
-	top.score.mode="image";
-	top.score.speed=25;
-	offScreen="1";
-	speed=25;
- } 
+	if (!top.score){
+		top.score = new Object;
+		top.score.level=1;
+		top.score.mode="image";
+		top.score.speed=25;
+		offScreen="1";
+		speed=25;
+	 } 
 
 
 	if (top.score){
@@ -790,6 +813,9 @@ if (!top.score){
 	}
 }
 
+/* Function : drawSet
+ * Meta: unused
+ */
 function drawSet(imaze){
 
 	document.getElementById("maze").innerHTML="";
@@ -804,6 +830,10 @@ function drawSet(imaze){
 
 }
 
+/* 
+ * Function : drawCell
+ * Meta: draws maze cells which are only used in the css maze (not the background graphic maze)
+ */
 function drawCell(x,y,cellClass,content){
 	cellHTML = '<div id="cell_' + x + '-' + y + '" class="mazeCell ' + cellClass + '" style="position:absolute; top:' + x + 'px; left:' + y + 'px">' + content + '</div>';
 	document.getElementById("maze").innerHTML = document.getElementById("maze").innerHTML + cellHTML;
