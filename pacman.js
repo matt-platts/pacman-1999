@@ -404,7 +404,8 @@ function kd(e){
 		if (key=="78" || key=="110" || key == "37") {key="L"}
 		if (key=="77" || key=="109" || key == "39") {key="R"}
 
-		if (key=="80" || key=="112"){ 
+		if (key=="82" || key=="114"){ top.location.reload();} // r = reset
+		if (key=="80" || key=="112"){
 				onPause=1; 
 				if (pacTimer){ clearTimeout(pacTimer);}
 				if (ghostsTimer){ clearTimeout(ghostsTimer);}
