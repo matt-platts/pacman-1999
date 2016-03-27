@@ -710,7 +710,7 @@ function gameEnd(){
 		top.score.score=score
 		top.score.lives = lives
 		top.score.level++
-		if (top.score.level==9){
+		if (top.score.level==10){
 			top.score.level=1
 			if (top.score.speed>=5){top.score.speed=top.score.speed-5;}
 		}
