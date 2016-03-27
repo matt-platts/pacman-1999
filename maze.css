@@ -100,7 +100,7 @@
 	}
 
 	.fillForwards {
-		position:relative; left:28px; top:-1px; background-color:transparent; height:28px; border-top:1px blue solid; border-bottom:1px blue solid; width:22px;
+		position:relative; left:28px; top:-1px; background-color:transparent; height:28px; border-top:1px blue solid; border-bottom:1px blue solid; width:22px; /* use 32px to close current gaps */
 	}
 	.fillForwards_white {
 		 border-top:1px white solid; border-bottom:1px white solid;

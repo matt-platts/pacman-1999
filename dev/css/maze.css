@@ -1,0 +1,120 @@
+	.mazeCell {
+		width:28px;
+		height:28px;
+		background-color:#000;
+		overflow:none;
+		border:2px #000 solid;
+		color:#fff;
+		border-radius:2px;
+	}
+
+	.UDXX{ 
+		border-left:2px #0055ff solid;
+		border-right:2px #0055ff solid;
+	}
+	.XXLR {
+		border-top:2px #0055ff solid;
+		border-bottom:2px #0055ff solid;
+	}
+
+	.XXXR {
+		border-left:2px #0055ff solid;
+		border-top:2px #0055ff solid;
+		border-bottom:2px #0055ff solid;
+	}
+	.XXLX {
+		border-right:2px #0055ff solid;
+		border-top:2px #0055ff solid;
+		border-bottom:2px #0055ff solid;
+	}
+	.UXXX {
+		border-bottom:2px #0055ff solid;
+		border-left:2px #0055ff solid;
+		border-right:2px #0055ff solid;
+	}
+	.XDXX {
+		border-top:2px #0055ff solid;
+		border-left:2px #0055ff solid;
+		border-right:2px #0055ff solid;
+	}
+	.XDXR {
+		border-top:2px #0055ff solid;
+		border-left:2px #0055ff solid;
+	}
+	.XDLX {
+		border-top:2px #0055ff solid;
+		border-right:2px #0055ff solid;
+	}
+	.UXXR {
+		border-left:2px #0055ff solid;
+		border-bottom:2px #0055ff solid;
+		border-bottom-left-radius:5px;
+		border-top-right-radius:5px;
+	}
+	.UXLX {
+		border-bottom:2px #0055ff solid;
+		border-right:2px #0055ff solid;
+		border-bottom-right-radius:5px;
+		border-top-left-radius:5px;
+
+	}
+	.UXLR {
+		border-bottom:2px #0055ff solid;
+	}
+	.XDLR {
+		border-top:2px #0055ff solid;
+	}
+	.UDXR {
+		border-left:2px #0055ff solid;
+	}
+	.UDLX {
+		border-right:2px #0055ff solid;
+	}
+
+	.UDLR {
+
+	}
+
+	.blockLowerRight:after {
+			content:''; width:2px; height:20px; background:#0055ff; position:absolute; right:0px; top:30px;
+	}
+
+	.blockLowerLeft:before {
+			content:''; width:2px; height:20px; background:#0055ff; position:absolute; left:-2px; top:30px;
+	}
+
+	.blockTopRight:after {
+			content:''; width:20px; height:2px; background:#0055ff; position:absolute; left:30px; top:-2px;
+	}
+	.blockTopRightLowerRight:after {
+			content:''; width:2px; height:20px; background:yellow; position:absolute; right:0px; top:30px;
+	}
+	.blockTopRightLowerRight:before {
+			content:''; width:20px; height:2px; background:red; position:absolute; left:30px; top:-2px;
+	}
+
+	.blockTAndBottomRight:after {
+	}
+	.blockTopAndBottomRight:before {
+			content:''; width:20px; height:2px; background:pink; position:absolute; left:30px; bottom:0px;
+	}
+
+	.fillForwards {
+		position:relative; left:28px; top:-2px; background-color:transparent; height:28px; border-top:2px #0055ff solid; border-bottom:2px #0055ff solid; width:32px; /* use 32px to close current gaps */
+	}
+	.fillForwards_white {
+		 border-top:2px white solid; border-bottom:2px white solid;
+	}
+
+	#mazeinner {
+		border:2px #0055ff solid;
+		border-radius:2px;
+		float:left;
+		width:585px;
+		height:465px;
+		padding:5px;
+		margin-top:10px;
+		margin-left:20px;
+	}
+
+	input {border:0px; outline:0px;}
