@@ -3,71 +3,83 @@
 
 <html>
 <head>
-	<title>Pac Man - Level 5</title>
-	<script language="JavaScript" src="mazedata5.js"></script>
-	<script language="JavaScript" src="pacman.js"></script>
+	<title>Pac Man - Level 1</title>
+
+	<link rel="stylesheet" type="text/css" href="css/maze.css" />
+	<link rel="stylesheet" type="text/css" href="css/pacman.css" />
+
 	<style type="text/css">
-	.scores { font-family:verdana, arial, helvetica; font-size:12px; color:orange; background-color:#000000; border=0}
+		.scores { font-family:verdana, arial, helvetica; font-size:12px; color:green; background-color:#000000; border=0}
 	</style>
-	<link rel="stylesheet" type="text/css" href="maze.css" />
 </head>
 
+<body onKeyDown="kd(event)" onKeyUp="ku(event)">
 
-<body bgcolor="000000" onLoad="init()" onKeyDown="kd(event)" onKeyUp="ku(event)">
-
-<div id="score" align="center" style="position:absolute; top:445px; left:10px; width:600px; height:20px"z-Index:200>
-	<font face="verdana, arial, helvetica" size="2" color="yellow">
-	<form>
-		SCORE: <input type="text" class="scores" value="000" size="4" name="score" readonly> &nbsp;&nbsp;&nbsp;LIVES: <input type="text" class="scores" value="3" size="1" name="lives" readonly>  &nbsp;&nbsp;&nbsp;TIME: <input type="text" class="scores" value="2000" size="4" name="gametimer" readonly>
-	</form>
-	</font>
+<div id="score" align="center">
+<form>
+SCORE: <input type="text" class="scores" value="000" size="4" name="score" readonly> LIVES: <input type="text" class="scores" value="3" size="1" name="lives" readonly>  TIME: <input type="text" class="scores" value="2000" size="4" name="gametimer" readonly>
+</form>
 </div>
 
-<div id="maze" style="position:absolute; left:0px; top:0px; z-Index:1">
-	<img src="graphics/maze5.gif" name="maze" width=563 height=447 alt="" border="0">
+<div id="maze"> 
+<div id="mazeinner"></div>
 </div>
 
-<div id='pacman' style="position:absolute; left:315px; top:285px; width:50px; height:50px; z-index:3">
-<img src="graphics/pacmanr.gif" width=30 height=30 name="pman" alt="" border="0">
+<div id="pacman" name="pacman" class="sprite pacman" style="top:265px; left:305px;">
+<img src="graphics/pacmanr.gif" name="pman" alt="" border="0">
 </div>
 
-<div id='ghost0' style="position:absolute; left:275px; top:125px; width:50px; height:50px; z-index:4">
-<img src="graphics/ghost1.gif" width=30 height=30 name="gst0" alt="" border="0">
+<div id='ghost0' class="sprite ghost" style="top:205px; left:305px;">
+<img src="graphics/ghost1.gif" name="gst0" alt="" border="0">
 </div>
 
-<div id='ghost1' style="position:absolute; left:275px; top:125px; width:50px; height:50px; z-index:5">
-<img src="graphics/ghost2.gif" width=30 height=30 name="gst1" alt="" border="0">
+<div id='ghost1' class="sprite ghost" style="top:205px; left:305px;">
+<img src="graphics/ghost2.gif" name="gst1" alt="" border="0">
 </div>
 
-<div id='ghost2' style="position:absolute; left:275px; top:125px; width:50px; height:50px; z-index:6">
-<img src="graphics/ghost3.gif" width=30 height=30 name="gst2" alt="" border="0">
+<div id='ghost2' class="sprite ghost" style="top:205px; left:305px;">
+<img src="graphics/ghost3.gif" name="gst2" alt="" border="0">
 </div>
 
-<div id='ghost3' style="position:absolute; left:275px; top:125px; width:50px; height:50px; z-index:7">
-<img src="graphics/ghost4.gif" width=30 height=30 name="gst3" alt="" border="0">
+<div id="ghost3" class="sprite ghost" style="top:205px; left:305px;">
+<img src="graphics/ghost4.gif" name="gst3" alt="" border="0">
 </div>
 
-<div id="fruit" style="position:absolute;top:235px; left:265px; width:50px; height:50px; z-index:2; visibility:hidden">
-	<image src="graphics/cherry.jpg" name="berry" width=23 height=23>
+<div id="fruit" class="sprite" style="position:absolute;top:265px; left:305px; visibility:hidden">
+<img src="graphics/cherry.gif" name="berry" width=23 height=23>
 </div>
 
-<div id="start" style="position:absolute;top:135px; background-image:url(graphics/message_bg.jpg); background-repeat:no-repeat; left:165px; width:285px; height:191px; z-index:8; visibility:visible; padding-top:80px; text-align:center;">
-	<span style="font-size:15px; color:red; font-family:Verdana, Arial, Helvetica, sans-serif; font-weight:bold;">Get Ready...</span>
+<div id="start" class="notice "style="visibility:visible;">
+<span class="notice_top">Get Ready...</span></div>
+
+<div id="message" class="notice">
+	<span class="notice_top">One Life Lost</span><br />
+	<span class=="notice_bottom">Get Ready..</span>
 </div>
 
-<div id="message" style="position:absolute;top:135px; background-image:url(graphics/message_bg.jpg); background-repeat:no-repeat; left:165px; width:285px; height:191px; z-index:8; visibility:hidden; padding-top:40px; text-align:center;">
-	<span style="font-size:15px; color:red; font-family:Verdana, Arial, Helvetica, sans-serif; font-weight:bold;">One Life Lost</span><br />
-	<span style="font-size:15px; color:lime; display:block; margin-top:40px;font-family:Verdana, Arial, Helvetica, sans-serif; font-weight:bold;">Get Ready..</span>
+<div id="messageEnd" class="notice" style="z-index:9;">
+	<span class="notice_top">Final Life Lost - <font color='orange'>Game Over</font></span><br />
+	<span id="score" class="notice_bottom"></span>
 </div>
 
-<div id="messageEnd" style="position:absolute;top:135px; background-image:url(graphics/message_bg.jpg); background-repeat:no-repeat; left:165px; width:285px; height:191px; z-index:9; visibility:hidden; padding-top:80px; text-align:center;">
-	<span style="font-size:15px; color:red; font-family:Verdana, Arial, Helvetica, sans-serif; font-weight:bold;">Final Life Lost - <font color='orange'>Game Over</font></span><br />
-	<span id="score" style="font-size:15px; color:lime; display:block; margin-top:40px;font-family:Verdana, Arial, Helvetica, sans-serif; font-weight:bold;"></span>
-</div>
-
+<!-- Include javascript libraries //-->
+<script language="JavaScript" src="js/mazedata5.js"></script>
+<script language="JavaScript" src="js/maze.js"></script>
+<script language="JavaScript" src="js/pacman.js"></script>
 <script language="JavaScript">
 <!-- 
-renderGrid();
+var mazedata = renderGrid();
+
+function ready(fn) {
+  if (document.readyState != 'loading'){
+    fn();
+  } else {
+    document.addEventListener('DOMContentLoaded', fn);
+  }
+}
+
+ready(init);
+
 //-->
 </script>
 </body>
