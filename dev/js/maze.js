@@ -82,6 +82,8 @@ function renderGrid(){
 					movestring = movestring.replace("XXLX","XXLO"); 
 				}
 				styles += " " + movestring;
+			 } else if (bit==5){
+				styles += " ghostbarrier";
 			}
 
 			// print the pill if it's a cell with 1 in the binary maze

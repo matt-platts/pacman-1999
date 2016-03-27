@@ -118,3 +118,11 @@
 	}
 
 	input {border:0px; outline:0px;}
+
+	.ghostbarrier {
+		border-top:5px #ff0000 solid;
+		height:28px;
+		background-color:#000;
+		border-radius:3px;
+		padding:0px 2px 0px 2px;
+	}
