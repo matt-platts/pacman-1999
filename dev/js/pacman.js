@@ -7,7 +7,7 @@
 
 
 // initial settings. these should be increased at around 10000 points?
-var powerPillLifetime=140; // how many iterations the powerpill lasts for - hard is 120
+var powerPillLifetime=340; // how many iterations the powerpill lasts for - hard is 120
 var ghostBlinkLifetime=25; // how long the ghosts blink for within the power pill. Hard is 15.
 var fruitLifetime=95; // how many iterations a piece of fruit stays on screen - hard is 80
 var messageLifetime=1500; // millisecons for the duration of a message (life lost, get ready etc)
@@ -19,7 +19,7 @@ if (!top.score){
 	top.score = new Object;
 	top.score.level=1;
 	top.score.mode="css";
-	top.score.speed=25;
+	top.score.speed=40;
 	top.score.lives=3;
 	top.score.gameTime=2000;
 	top.score.exlife1 = true;
@@ -85,8 +85,8 @@ var movekey = "D" // active key
 var engage2 = false
 var fruitOn=false
 var fruitTimer=0
-var speed=top.score.speed
-var gameTime=top.score.gameTime
+if (top.score){ var speed=top.score.speed } else { var speed=40;}
+if (top.score){ var gameTime=top.score.gameTime; } else { gameTime=5000;}
 
 // start positions for levels 1,3,4,5
 var pacStartTop=265
@@ -94,7 +94,7 @@ var pacStartLeft=305
 var ghostStartTop=195
 var ghostStartLeft=305
 
-if (top.score.level==2) {
+if (top.score && top.score.level==2) {
 	pacStartTop=265
 	pacStartLeft=305
 	ghostStartTop=195
@@ -104,10 +104,13 @@ var ghostscore=50
 var nextfruitscore=score+600
 var thisfruit=0
 var fruitArray = new Array(true,true)
-if (top.score.level==1) offScreen=1
-if (top.score.level==2 || top.score.level==5) offScreen=2
-if (top.score.level==3 || top.score.level==4) offScreen=3
-
+if (top.score){
+	if (top.score.level==1) offScreen=1
+	if (top.score.level==2 || top.score.level==5) offScreen=2
+	if (top.score.level==3 || top.score.level==4) offScreen=3
+} else {
+	offScreen=1;
+}
 /* Function: init
  * Meta: init() is called from onload, init() defines arrays for later use, then calls the ghosts() function and the move() funcion for the first time, to set them off. These functions then repeatedly call themselves on a timeout command (nb: move is also called from keydown events - we don't want to wait!).
 */
@@ -190,10 +193,6 @@ function ghosts(){
 	//possG is the possible moves for each ghost, based on its co-ordinates of the mazedata array 
 	for (wg=0;wg<4;wg++){
 		//possG[wg] = eval ("mazedata[topG[" + wg + "]].left" + parseInt(leftG[wg]))
-		//console.log("LeftG: " + leftG[wg]);
-		//console.log("LeftG: " + parseInt(leftG[wg]));
-		//console.log("TopG: " + parseInt(topG[wg]));
-		//console.log(mazedata[195]);
 		possG[wg] = mazedata[topG[wg]][parseInt(leftG[wg])];
 
 		//check possibile moves. The ghostData array contains info on which moves are possible. If more than 3 directions are present, or only 1 (ie backwards, so dead end) - a new direction must be generated...
@@ -230,6 +229,9 @@ function ghosts(){
 		if (onPath[wg] && possG[wg].length=='6') {
 			ghostDir[wg] = possG[wg].charAt(5)
 			//alert("Ghost" + i + " told to go " + ghostDir[i])
+		} else if (onPath[wg]){
+			console.log("ON A PATH");
+		
 		}
 
 		//status bar stuff for checking variables..
@@ -250,17 +252,17 @@ function ghosts(){
 
 		//for the path stuff... if it goes off the maze (er.. this means there is an error somehow int the mazedata array!), then immediately return to home.
 		if (onPath[wg]) {
-			if (topG[wg]>=386 || topG[wg] <=35 || leftG[wg]<=35 || leftG[wg] >=561) {
-			eval ("divGhost" + wg + ".left = ghostStartLeft")
-			eval ("divGhost" + wg + ".top = ghostStartTop")
-			leftG[wg] = eval ("parseInt(divGhost" + wg + ".left)")
-			topG[wg] = eval ("parseInt(divGhost" + wg + ".top)")
-			onPath[wg] = false
-			ghostDir[wg] = "U"
-			eval ("ghost" + wg + "src.src=ghimg" + wg + ".src")
+			if (topG[wg]>=446 || topG[wg] <=35 || leftG[wg]<=25 || leftG[wg] >=591) {
+				eval ("divGhost" + wg + ".left = ghostStartLeft")
+				eval ("divGhost" + wg + ".top = ghostStartTop")
+				leftG[wg] = eval ("parseInt(divGhost" + wg + ".left)")
+				topG[wg] = eval ("parseInt(divGhost" + wg + ".top)")
+				onPath[wg] = false
+				ghostDir[wg] = "U"
+				eval ("ghost" + wg + "src.src=ghimg" + wg + ".src")
 			}
 			// and if it's home, reset it to not vulnerable and back to correct image
-			if (leftG[wg] == 275 && topG[wg] == 175){
+			if (leftG[wg] == ghostHomeBase[0] && topG[wg] == ghostHomeBase[1]){
 			if (!won){onPath[wg] = false;}
 			vulnerable[wg] = false;
 			eval ("ghost" + wg + "src.src=ghimg" + wg + ".src")
@@ -586,12 +588,64 @@ function showFruit() {
 }
 
 //generates a random direction for a particular ghost when there's a branch in the maze.
-function getGhostDir(who,howmany,possibilities){
-		newposs=possibilities.replace(/X/g,"")
-		if (!onPath[who]) {
-			direction = eval("Math.round(Math.random() *" + howmany + ")")
-			ghostDir[who] = newposs.charAt(direction)
+function getGhostDir(who,howMany,possibilities){
+		possibilities=possibilities.replace(/X/g,"");
+		if (howMany>1){
+			possibilities=excludeOppositeDirection(who,possibilities);
+			howMany--;
 		}
+		if (!onPath[who]) {
+			direction = eval("Math.round(Math.random() *" + howMany + ")");
+			ghostDir[who] = possibilities.charAt(direction);
+		} else {
+			ghostDir[who] = getPathToHome(who);
+		}
+}
+
+/* removes the opposite direction from the list of possible moves - no point in going back where we've just come fron - keeps them moving */
+function excludeOppositeDirection(who,possibilities){
+	if (ghostDir[who]=="R"){
+		possibilities=possibilities.replace(/L/,"");
+	}
+	if (ghostDir[who]=="L"){
+		possibilities=possibilities.replace(/R/,"");
+	}
+	if (ghostDir[who]=="D"){
+		possibilities=possibilities.replace(/U/,"");
+	}
+	if (ghostDir[who]=="U"){
+		possibilities=possibilities.replace(/D/,"");
+	}
+	return possibilities;
+}
+
+function getPathToHome(who){
+	console.log("Getting path to home at " + ghostHomeBase[0] + "," + ghostHomeBase[1] + " from " + leftG[who] + "," + topG[who]);
+	currentCell = mazedata[parseInt([topG[who]])][parseInt(leftG[who])]
+	console.log(currentCell);
+	home=null;
+
+
+	if (leftG[who] > ghostHomeBase[0] && currentCell.charAt(2)=="L" && ghostDir[who] != "R" && ghostDir[who] != null){
+		home = "L";
+		console.log("Going" + home);	
+	} else if (leftG[who] <= ghostHomeBase[0] && currentCell.charAt(3)=="R" && ghostDir[who] != "L" && ghostDir[who] != null){
+		home = "R";
+		console.log("Going" + home);	
+	}
+
+	if (topG[who] > ghostHomeBase[1] && currentCell.charAt(0)=="U" && ghostDir[who] != "D" && ghostDir[who] != null){
+		home="U";
+		console.log("Going" + home);	
+	} else if (topG[who] <= ghostHomeBase[1] && currentCell.charAt(1)=="D" && ghostDir[who] != "U" && ghostDir[who] != null){
+		home="D";
+		console.log("Going" + home);	
+	}
+
+
+	console.log(ghostDir[who],topG[who],leftG[who],ghostHomeBase[0],ghostHomeBase[1],currentCell.charAt[0],currentCell.charAt[1],currentCell.charAt[2],currentCell.charAt[3],home);
+	if (!home) { home = ghostDir[who];}
+	return home;
 }
 
 // generates a random direction for a ghost, but not towards pacman (used for when a powerpill is active).

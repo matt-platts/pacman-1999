@@ -143,6 +143,7 @@ function renderGrid(){
 			} else if (bit==5){
 				styles += " ghostbarrier";
 				cellInnerHTML = "";
+				ghostHomeBase=Array(h_offset,v_offset); // set the return to base position for the game
 
 			// print the pill if it's a cell with 1 in the binary maze
 			} else if (bit==1){
