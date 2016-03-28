@@ -690,17 +690,17 @@ function intelligence(g){
 function gameEnd(){
 	if (mazeNo==2) mazeNo=0
 	//eval ("mazesource.src=maze" + mazeNo + ".src")
-	mazeCells = document.getElementsByClassName("mazeCell");
+	mazeCells = document.getElementsByClassName("wallCell");
 	if (mazeNo==0){
 		for(var i = 0; i < mazeCells.length; i++) {
 		    mazeCells[i].style.borderColor= 'white';
 		}
-		document.getElementById("maze").style.borderColor="white";
+		document.getElementById("mazeinner").style.borderColor="white";
 	} else {
 		for(var i = 0; i < mazeCells.length; i++) {
 		    mazeCells[i].style.borderColor = 'blue';
 		}
-		document.getElementById("maze").style.borderColor="blue";
+		document.getElementById("mazeinner").style.borderColor="blue";
 	}
 	mazeNo++
 	mazecount++

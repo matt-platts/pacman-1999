@@ -80,7 +80,24 @@ function renderGrid(){
 
 			movestring += bit;
 			lineMoves.push(movestring); // ADD to an array of the whole line
-			styles=movestring.substring(0,4); // we add the 4 move positions to a css class in order to draw the correct borders for the maze
+
+			// This section draws the inner wall of the outer double wall (where x and y are the perimiters).
+			// The CSS for the mazecells is no longer used
+			if (i==0 || x==0 || i==14 || x==18 ){
+				styles=movestring.substring(0,4); // we add the 4 move positions to a css class in order to draw the correct borders for the maze
+				if (i==0){ styles = styles.replace("XXLR","XDLR");}
+				if (x==0) { styles = styles.replace("DXX","DXR");
+					styles=styles.replace("XXXR","UDLR");
+				}
+				if (i==14){ styles = styles.replace("XXLR","UXLR");}
+				if (x==18){ styles = styles.replace("DXX","DLX");
+					styles = styles.replace("XXLX","UDLR");
+				}
+			} else {
+				styles="";
+			}
+
+			wallStyles = movestring.substring(0,4);
 
 			// 4 is the off side tunnel
 			if (bit==4){
@@ -155,6 +172,9 @@ function renderGrid(){
 				mazedata[v_offset][h_offset] = "0"; 
 				mazedata[v_offset][h_offset+10] = "0";
 				mazedata[v_offset][h_offset+20] = "0";
+
+				str='<div id="cell-' + h_offset + '-' + v_offset + '" style="position:absolute; top:' + v_offset + 'px; left:' + h_offset + 'px;" class="wallCell w_' + wallStyles + '">' + cellInnerHTML + '</div>';
+				innerStr += str;
 			}
 
 			h_offset = h_offset + 30;
