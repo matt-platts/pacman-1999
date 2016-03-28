@@ -1,4 +1,11 @@
-Just load it up in your browser and remember the internet how it was before the millennium!!
+Just load it up in your browser and remember the old arcade games of the '80s! This has always been available on mattplatts.com/pacman, and sat on it's own url javascript-pacman.com for a few years at some point. 
 
 Update 2016:
-Started having a mess with this again years down the line. Started work on generating maze via css - use the settings page to select the css version.
+Started having a mess with this again years down the line. Started work on generating maze via css rather than supplying backgorund graphics - you can use the speed settings page to select the css version (a work in progress).
+
+March 2016 - the dev folder now contains an in-progres rewrite.
+
+1. The maze visual and data of all possible moves is now generated from a simple array of largely 0s and 1s to denote available cells. Other numbers are used to position the ghosts home and mark the tunnels from one side to the other, etc. See maze.js which has been commented.
+2. Pretty much a total rewrite is going on. The original logic was good enough in an 'I blagged it' kind of way, and it is fun to play, the next version will be perfect ;)
+3. I have some ideas for some new features too... more on that later :) 
+
