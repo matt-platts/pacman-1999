@@ -1,3 +1,8 @@
+/* 
+ * File: maze.js
+ * Meta: functions for creating the maze visual and an array to describe all of the maze cells in terms of possible moves, where pills are etc. 
+*/
+
 var pillNumber=0; // count the pills as we add them. This var is used to check if the screen has been completed in the game. 
 
 /* 
