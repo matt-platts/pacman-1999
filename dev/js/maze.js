@@ -87,10 +87,12 @@ function renderGrid(){
 					movestring = movestring.replace("XXLX","XXLO"); 
 				}
 				styles += " " + movestring;
+				cellInnerHTML = "";
 
 			// 5 is the red barrier at the top of the ghosts home base
 			} else if (bit==5){
 				styles += " ghostbarrier";
+				cellInnerHTML = "";
 
 			// print the pill if it's a cell with 1 in the binary maze
 			} else if (bit==1){
