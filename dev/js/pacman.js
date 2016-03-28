@@ -451,6 +451,13 @@ function keyLogic(key){
 		if (movekey != key) {newkey = key; if (!moving) move(); keycount++}
 	}
 
+	newClass = "pacman_" + key;
+	document.getElementById("pacman").classList.remove("pacman_U");
+	document.getElementById("pacman").classList.remove("pacman_D");
+	document.getElementById("pacman").classList.remove("pacman_L");
+	document.getElementById("pacman").classList.remove("pacman_R");
+	document.getElementById("pacman").classList.add(newClass);
+
 }
 
 /* Function : ku
@@ -480,6 +487,13 @@ function move(){
 			engage = true
 			movekey = lastkey
 			eval ("pacsource.src = pman" + movekey + ".src")
+
+			newClass = "pacman_" + newkey;
+			document.getElementById("pacman").classList.remove("pacman_U");
+			document.getElementById("pacman").classList.remove("pacman_D");
+			document.getElementById("pacman").classList.remove("pacman_L");
+			document.getElementById("pacman").classList.remove("pacman_R");
+			document.getElementById("pacman").classList.add(newClass);
 		} else {
 			engage = false
 			moving = false
@@ -488,6 +502,7 @@ function move(){
 	//status = possibilities + "," + pacTop + "-" + pacLeft + "," + u + d + l + r + "- " + engage
 
 	if (engage) {
+
 
 		if (movekey==u) {divPacman.top=(pacTop-10); pacTop=pacTop-10}
 		if (movekey==d) {divPacman.top=(pacTop+10); pacTop=pacTop+10}
