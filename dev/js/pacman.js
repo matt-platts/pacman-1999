@@ -691,14 +691,17 @@ function gameEnd(){
 	if (mazeNo==2) mazeNo=0
 	//eval ("mazesource.src=maze" + mazeNo + ".src")
 	mazeCells = document.getElementsByClassName("wallCell");
+	wallCells = document.getElementsByClassName("mazeCell");
 	if (mazeNo==0){
 		for(var i = 0; i < mazeCells.length; i++) {
-		    mazeCells[i].style.borderColor= 'white';
+		    mazeCells[i].style.borderColor = 'white';
+		    wallCells[i].style.borderColor = 'white';
 		}
 		document.getElementById("mazeinner").style.borderColor="white";
 	} else {
 		for(var i = 0; i < mazeCells.length; i++) {
 		    mazeCells[i].style.borderColor = 'blue';
+		    wallCells[i].style.borderColor = 'blue';
 		}
 		document.getElementById("mazeinner").style.borderColor="blue";
 	}

@@ -82,17 +82,45 @@ function renderGrid(){
 			lineMoves.push(movestring); // ADD to an array of the whole line
 
 			// This section draws the inner wall of the outer double wall (where x and y are the perimiters).
-			// The CSS for the mazecells is no longer used
+			// The CSS for the mazecells is no longer used, but anticipating I may again in the future, I'm manually altering it here.
 			if (i==0 || x==0 || i==14 || x==18 ){
+
 				styles=movestring.substring(0,4); // we add the 4 move positions to a css class in order to draw the correct borders for the maze
-				if (i==0){ styles = styles.replace("XXLR","XDLR");}
-				if (x==0) { styles = styles.replace("DXX","DXR");
-					styles=styles.replace("XXXR","UDLR");
+
+				if (i==0){ 
+					if (x != 0 && x!=18){
+						 styles = styles.replace("XXL","XDL");	
+						 styles = styles.replace("XXX","XDL");	
+						 styles = styles.replace("XDX","XDL");	
+						 styles = styles.replace("XDLX","XDLR");	
+					}
 				}
-				if (i==14){ styles = styles.replace("XXLR","UXLR");}
-				if (x==18){ styles = styles.replace("DXX","DLX");
-					styles = styles.replace("XXLX","UDLR");
+				if (i==14){
+					styles = styles.replace("XXXR","UXXR");
+					styles = styles.replace("XXLR","UXLR");
 				}
+				if (x==0){
+					styles = styles.replace("DXX","DXR");
+					styles = styles.replace("XXLR","XDLR");
+				}
+				if (x==18){
+					styles = styles.replace("UDX","UDL");
+					styles = styles.replace("XDX","UDL");
+					styles = styles.replace("UXL","UDL");
+				}
+
+				styles = styles.replace("XXLR","");
+				if (bit==4 && i!=0){
+						styles = "UDLR";
+				}
+				if (bit==4 && i==0){
+					styles=styles.replace("XXLX","XDLR");
+					styles=styles.replace("XXXR","XDLR");
+				}
+				if (x==18 && i == 14){
+					styles = "UXLX";
+				}
+			
 			} else {
 				styles="";
 			}
