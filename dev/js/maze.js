@@ -1,7 +1,9 @@
-pillNumber=0; // we are generating this here and need to use it in pacman.js
+var pillNumber=0; // count the pills as we add them. This var is used to check if the screen has been completed in the game. 
 
 /* 
- * convert 1d array to a 2d array of rows and columns
+ * Function: convert
+ * Meta: Convert the original maze data which is a 1d array to a 2d array of rows and columns
+ *       This 2d array is stored in the var interim_maze, which is later looped in order to build a bigger array containing every possible move available from each cell.
  */
 function convert(maze){
 	maze = maze.join("");
@@ -32,14 +34,15 @@ function convert(maze){
 }
 
 /* 
- * function : renderGrid
- * meta: takes the 2d grid and builds a 2d array of possible moves from each position together with the following information:
- *      Bit 1 - set to U if can go up
-	Bit 2 - set to D if can go down
-	Bit 3 - set to L if can go left
-	Bit 4 - set to R if can go right
-	Bit 5 - set to 1 if a pill is in the cell, 2 if a powerpill, 3 if it is the ghosts home, 4 if the cell goes to an offscreen tunnel.  
-	Bit 6 - not yet taken into account, in the original version this contained one direction character to tell the ghosts how to get back home. 
+ * Function : renderGrid
+ * Meta: takes the 2d grid and builds a larger 2d array of possible moves from each position and other information. Each cell contains data up to 6 bytes long:
+ *      Byte 1 - set to U if can go up, X if not
+ *	Byte 2 - set to D if can go down, X if not
+ *	Byte 3 - set to L if can go left, X if not
+ *	Byte 4 - set to R if can go right, X if not
+ *	Byte 5 - set to 1 if a pill is in the cell, 2 if a powerpill, 3 if it is the ghosts home, 4 if the cell goes to an offscreen tunnel, 5 indicates the top of the ghosts home.  
+ *               which should only allow movement in one direction (out of the ghosts home) and not in unless the ghost has been eaten
+ * 	Byte 6 - In the original version this contained one direction character (U, D, L or R) to tell the ghosts how to get back home. This still needs to be calculated. 
  *
  * 	This function also takes care of screen rendering including pills.
 */
@@ -73,6 +76,8 @@ function renderGrid(){
 			movestring += bit;
 			lineMoves.push(movestring); // ADD to an array of the whole line
 			styles=movestring.substring(0,4); // we add the 4 move positions to a css class in order to draw the correct borders for the maze
+
+			// 4 is the off side tunnel
 			if (bit==4){
 				if (x==0){
 					styles = styles.replace("XXXR","XXLR"); 
@@ -82,17 +87,22 @@ function renderGrid(){
 					movestring = movestring.replace("XXLX","XXLO"); 
 				}
 				styles += " " + movestring;
-			 } else if (bit==5){
+
+			// 5 is the red barrier at the top of the ghosts home base
+			} else if (bit==5){
 				styles += " ghostbarrier";
-			}
 
 			// print the pill if it's a cell with 1 in the binary maze
-			if (bit==1){
+			} else if (bit==1){
 				cellInnerHTML="<img src='graphics/pil.gif' name='pil_" + h_offset + v_offset + "'>";
 				pillNumber++;
+
+			// 2 is a powerpill
 			} else if (bit==2){
 				cellInnerHTML="<div id='p" + v_offset + h_offset + "' ><img src='graphics/powerpil.gif' name='pil_" + h_offset + v_offset + "'></div>";
 				pillNumber++;
+
+			// 0 is a cell within a wall
 			} else {
 				cellInnerHTML="<div id='p" + v_offset + h_offset + "' ></div>";
 			}
@@ -107,43 +117,42 @@ function renderGrid(){
 				}
 			}
 
-			// if it's not a zero in the original maze array, add the html to a string, and add this to innerStr. innerStr is used as innerHTML to the maze div.
+			// Create the lookup array, which contains data about your possible moves, and print the pills whilst looping.. 
+			// The lookup array maps to pixels on the screen so you can look up moves from the top and left properties of the sprites.
+			// if it's not a zero in the original maze array, add the html to a string, and add this to innerStr. innerStr is built up and used as innerHTML to the maze div.
 			if (bit != "0"){
 				str='<div id="cell-' + h_offset + '-' + v_offset + '" style="position:absolute; top:' + v_offset + 'px; left:' + h_offset + 'px;" class="mazeCell ' + styles + '">' + cellInnerHTML + '</div>';
 				innerStr += str;
 				mazedata[v_offset][h_offset] = movestring; 
 
-				// if you can go right, populate the next two elements in the full array with left and right options. These are spaces pacman takes up between the main cells. Cells are 30x30 and pacman moves in 10px increments.
-				if (movestring.charAt(3)=="R"){
+				// Cells and sprites are 30x30px and pacman moves in 10px increments. 
+				// If you can go right from this cell, populate the next two elements in the lookup array (these are on screen positions) with left and right options. 
+				// These are spaces pacman takes up between the main cells. 
+				if (movestring.charAt(3)=="R"){ // can move right from here
 					mazedata[v_offset][h_offset+10] = "XXLR";
 					mazedata[v_offset][h_offset+20] = "XXLR";
 				}
-				// and the same for down. Not we may need to initialise the arrays when going down.
-				if (movestring.charAt(1)=="D"){
+				if (movestring.charAt(1)=="D"){ // and the same for down. Not we may need to initialise the arrays when going down.
 					if (typeof(mazedata[v_offset+10]) != "object"){
 						mazedata[v_offset+10] = Array();
 					}
 					if (typeof(mazedata[v_offset+20]) != "object"){
 						mazedata[v_offset+20] = Array();
 					}
-					
 					mazedata[v_offset+10][h_offset] = "UDXX";
 					mazedata[v_offset+20][h_offset] = "UDXX";
-					
 				}
 
+			// add zeros (technically this should not be necessary but it saves checking for undefined and seems nicer
 			} else {
 				mazedata[v_offset][h_offset] = "0"; 
 				mazedata[v_offset][h_offset+10] = "0";
 				mazedata[v_offset][h_offset+20] = "0";
 			}
 
-
 			h_offset = h_offset + 30;
 
 		}
-		// have all the innards in lineMoves
-		//mazedata[v_offset] = new set(lineMoves.join(","))
 		//console.log("Linemoves: " + lineMoves);
 		v_offset = v_offset + 30; 
 	}
