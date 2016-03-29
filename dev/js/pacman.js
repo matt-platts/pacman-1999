@@ -343,9 +343,11 @@ function ghosts(){
 
 	// check to see if a ghost has gone through the channel to the other side of the screen
 	for (i=0;i<4;i++){
-		if (offScreen==1 && topG[i] ==205) {offSideGhosts1()}
-		if (offScreen==2 && topG[i] ==25 || offScreen==2 && topG[i]==285) {offSideGhosts2()}
-		if (offScreen==3 && topG[i] ==125 || offScreen==3 && topG[i]==285) {offSideGhosts3()}
+		ghostPos = mazedata[topG[i]][parseInt(leftG[i])];
+		if (ghostPos && (ghostPos.charAt(2)=="O" || ghostPos.charAt(3)=="O")){
+			if (leftG[i] <= 35 && ghostDir[i] =="L") {leftG[i] = 555; }
+			if (leftG[i] >= 565 && ghostDir[i] =="R") {leftG[i] = 35; }
+		}
 	}
 
 	//intelligence()
@@ -365,34 +367,6 @@ function ghosts(){
 
 	}
 	if (!onPause){ ghostsTimer = setTimeout("ghosts()",speed) }
-}
-
-// for if ghost goes of screen through channel on first maze..
-function offSideGhosts1(){
-	for (i=0;i<4;i++){
-		if (topG[i] == 205 && leftG[i] <= 35 && ghostDir[i] =="L") {leftG[i] = 565; }
-		if (topG[i] == 205 && leftG[i] >= 565 && ghostDir[i] =="R") {leftG[i] = 45; }
-	}
-}
-
-//and second maze
-function offSideGhosts2(){
-	for (i=0;i<4;i++){
-		if (topG[i] == 25 && leftG[i] <= 45 && ghostDir[i] =="L") {leftG[i] = 505; }
-		if (topG[i] == 25 && leftG[i] >= 495 && ghostDir[i] =="R") {leftG[i] = 55; }
-		if (topG[i] == 285 && leftG[i] <= 45 && ghostDir[i] =="L") {leftG[i] = 505; }
-		if (topG[i] == 285 && leftG[i] >= 495 && ghostDir[i] =="R") {leftG[i] = 55; }
-	}
-}
-
-//and third
-function offSideGhosts3(){
-	for (i=0;i<4;i++){
-		if (topG[i] == 125 && leftG[i] == 35 && ghostDir[i] =="L") {leftG[i] = 505; }
-		if (topG[i] == 125 && leftG[i] == 515 && ghostDir[i] =="R") {leftG[i] = 45; }
-		if (topG[i] == 285 && leftG[i] == 35 && ghostDir[i] =="L") {leftG[i] = 505; }
-		if (topG[i] == 285 && leftG[i] == 515 && ghostDir[i] =="R") {leftG[i] = 45; }
-	}
 }
 
 // keydown = invoked if key pressed. First works out which key it is, and translates it to a direction. Four flags are present here - key, newkey, lastkey & movekey. If the key that is pressed (key) is not the same as the previously pressed key (newkey - it was last time round!), then the previously pressed key is stored in lastkey. Movekey is the current movement, and if it's not the same as the key just pressed (key) the value is stored in newkey, and the move function is called if a flag 'moving' is false. This will all make sense later - honest!
