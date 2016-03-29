@@ -38,13 +38,14 @@ body {
 	top:135px;
 	left:180px;
 	width:285px;
-	height:191px;
+	height:120px;
 	z-index:8;
 	visibility:hidden;
 	padding-top:80px;
 	text-align:center;
-	background-image:url(../graphics/message_bg.jpg);
-	background-repeat:no-repeat;
+	background-color:#000;
+	border:2px #0033ff solid;
+	border-radius:10px;
 }
 
 .notice_top {
@@ -52,15 +53,17 @@ body {
 	color:red;
 	font-family:verdana, arial, helvetica;
 	font-weight:bold;
+	display:inline-block;
 }
 
 .notice_bottom {
 	font-size:15px;
-	color:lime;
+	color:lime !important;
 	display:block;
 	margin-top:40px;
 	font-family:verdana, arial, helvetica;
 	font-weight:bold;
+	display:inline-block;
 }
 
 #score {

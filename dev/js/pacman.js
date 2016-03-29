@@ -73,6 +73,7 @@ var fruitOn=false
 var fruitTimer=0
 if (top.score){ var speed=top.score.speed } else { var speed=40;}
 if (top.score){ var gameTime=top.score.gameTime; } else { gameTime=5000;}
+if (top.score){ var level = top.score.level; } else { level=1;}
 
 // start positions for levels 1,3,4,5
 var pacStartTop=265
