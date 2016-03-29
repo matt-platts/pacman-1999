@@ -32,22 +32,8 @@ if (!top.score){
 if (document.all){top.main.document.focus();}
 
 // set main variables / images
-maze0 = new Image
-eval ("maze0.src = 'graphics/maze" + top.score.level + ".gif'")
-maze1 = new Image
-eval ("maze1.src = 'graphics/maze" + top.score.level + "inv.gif'")
 var mazecount=0
 var mazeNo=0
-pmanL = new Image
-pmanL.src = 'graphics/pacmanl.gif'
-pmanR = new Image
-pmanR.src = 'graphics/pacmanr.gif'
-pmanU = new Image
-pmanU.src = 'graphics/pacmanu.gif'
-pmanD = new Image
-pmanD.src = 'graphics/pacmand.gif'
-pmanW = new Image
-pmanW.src = 'graphics/pacmanw.gif'
 ghimg0 = new Image
 ghimg0.src = 'graphics/ghost1.gif'
 ghimg1 = new Image
@@ -143,7 +129,6 @@ function init(){
 		divMessEnd  =  (ns)? document.messageEnd:document.all.messageEnd.style
 	}
 
-	pacsource = (ns)? pacsource=document.pacman.document.images[0]:document.images.pman
 	ghost0src = (ns)? divGhost0.document.images[0]:document.images.gst0
 	ghost1src = (ns)? divGhost1.document.images[0]:document.images.gst1
 	ghost2src = (ns)? divGhost2.document.images[0]:document.images.gst2
@@ -154,7 +139,6 @@ function init(){
 	lifeform   = (ns)? document.score.document:document
 	timeform   = (ns)? document.score.document:document
 	pilsrc     = (ns)? document:document
-	mazesource = (ns)? document.maze.document.images[0]:document.images.maze
 
 	if (ns) {
 		document.captureEvents(Event.KEYDOWN|Event.KEYUP);
@@ -454,14 +438,12 @@ function move(){
 	if (newkey==u || newkey==d || newkey ==l || newkey == r) {
 
 		engage=true; movekey = newkey; lastkey = newkey // lastkey set to stop constant repetition of last 2 moves without the user touching anything.. see later on.
-		eval ("pacsource.src = pman" + movekey + ".src")
 
 	} else {
 
 		if (lastkey==u || lastkey==d || lastkey==l || lastkey==r) {
 			engage = true
 			movekey = lastkey
-			eval ("pacsource.src = pman" + movekey + ".src")
 
 			newClass = "pacman_" + newkey;
 			document.getElementById("pacman").classList.remove("pacman_U");
@@ -523,7 +505,6 @@ function move(){
 			if (pilcount>=pillNumber) {
 				won = true
 				onPath[0]=true; onPath[1]=true; onPath[2]=true;onPath[3]=true;
-				pacsource.src=pmanW.src
 				document.getElementById("pacman").style.display="none";
 				gameEnd();
 
@@ -782,7 +763,6 @@ function gameEnd(){
 
 
 	if (mazeNo==2) mazeNo=0
-	//eval ("mazesource.src=maze" + mazeNo + ".src")
 	mazeCells = document.getElementsByClassName("wallCell");
 	wallCells = document.getElementsByClassName("mazeCell");
 	if (mazeNo==0){
@@ -801,7 +781,7 @@ function gameEnd(){
 	mazeNo++
 	mazecount++
 	if (mazecount<12) {
-		mazeTimer=setTimeout ("gameEnd()",300)
+		mazeFlashTimer=setTimeout ("gameEnd()",300)
 	} else {
 		top.score.score=score
 		top.score.lives = lives
