@@ -553,7 +553,8 @@ function move(){
 				won = true
 				onPath[0]=true; onPath[1]=true; onPath[2]=true;onPath[3]=true;
 				pacsource.src=pmanW.src
-				gameEnd()
+				document.getElementById("pacman").style.display="none";
+				gameEnd();
 
 			}
 		}
@@ -649,6 +650,7 @@ function excludeOppositeDirection(who,possibilities){
 	return possibilities;
 }
 
+/* DEPRECATED - use headFOR instead with the home co-ordinates as the second param */
 function getPathToHome(who){
 	currentCell = mazedata[parseInt([topG[who]])][parseInt(leftG[who])]
 	console.log(currentCell);
@@ -675,6 +677,12 @@ function getPathToHome(who){
 	return home;
 }
 
+/* 
+ * Function: headFor
+ * Param who (string) - index of which ghost we are sending somewhere
+ * Param where (array) - 2 item aray of L and R co-ordinates of the cell we are sending the ghost toi
+ * Return home (string) - the direction that can be direcly set for that ghost
+*/
 function headFor(who,where){
 	currentCell = mazedata[parseInt([topG[who]])][parseInt(leftG[who])]
 	//console.log(currentCell);
@@ -797,6 +805,8 @@ function intelligence(g){
 
 // flash maze at end of level. Also should kill the move timeouts here really
 function gameEnd(){
+
+
 	if (mazeNo==2) mazeNo=0
 	//eval ("mazesource.src=maze" + mazeNo + ".src")
 	mazeCells = document.getElementsByClassName("wallCell");
@@ -834,3 +844,18 @@ function gameEnd(){
 function start(){
 	gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',messageLifetime) 
 }
+
+/* Thiknking about proper OO version */
+
+// ghost constructor
+var ghost = function(){
+	// properties:
+	// name - blinky, pinky, inky, clyde 
+	// src - the source image can be named after the name
+	// top
+	// left
+	// current direction
+	// alive bool 1,0 - 0 will become the original onPath variable
+	// mode (chase, scatter, frightened)
+}
+
