@@ -591,6 +591,9 @@ function getGhostDir(who,howMany,possibilities){
 		} else {
 
 			possibilities=possibilities.replace(/X/g,"");
+			if (mazedata[topG[who]][leftG[who]] == "3" && !onPath(who)){// ghosts can only re-enter the home base when on a path to regenerate 
+				possibilities=possibilities.replace(/5/g,"");
+			}
 			if (howMany>1){
 				possibilities=excludeOppositeDirection(who,possibilities);
 				howMany--;
