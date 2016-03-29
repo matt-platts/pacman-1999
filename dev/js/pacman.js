@@ -209,13 +209,15 @@ function ghosts(){
 		if (ghostCount>2 || ghostCount==1) getGhostDir(wg,ghostCount,possG[wg])
 
 		//if there's 2 directions only, the '8' added above is used to ascertain if they are opposite directions (eg Left & Right) or not. If they're opposite, obviously the previous direction will apply. If they're at right angles (No cases of 2 8's next to each other) a new direction must be generated.
+	
+
+
 		firstPair = false; secPair = false
 		if (ghostCount==2) {
 			if (ghostData[0] == ghostData[1]) firstPair = true
 			if (ghostData[2] == ghostData[3]) secPair = true
 			if (!firstPair && !secPair) getGhostDir(wg,ghostCount,possG[wg])
 		  }
-
 		//compare ghost positions to your position & if it can see you, adjust direction.
 		if (!onPath[wg]) { intelligence(wg) }
 
@@ -238,9 +240,11 @@ function ghosts(){
 		//status = possG[0] + ":" + possG[1] + ":" + possG[2] + ":" + possG[3] + "-- " + ghostDir[0] + " " + ghostDir[1] + " " + ghostDir[2] + " " + ghostDir[3] + "**** " + secondGhost[1] + "^^" + engGhost[0] + engGhost[1] + engGhost[2] + engGhost[3]
 
 		//store ghost positions so can be compared to positions next time round. If same, generate new direction. This is to over-ride when they stick if they're following you and you move out of the way, as there's nothing else to tell them to generate a new direction.
+		/*
 		if (preGtop[wg] == topG[wg] && preGleft[wg] == leftG[wg]) getGhostDir(wg,ghostCount,possG[wg])
 		preGtop[wg] = topG[wg]
 		preGleft[wg] = leftG[wg]
+		*/
 
 		//if the ghost is engaged, update position variable, and then position
 		if (engGhost[wg] || onPath[wg]) {
@@ -604,16 +608,27 @@ function showFruit() {
 
 //generates a random direction for a particular ghost when there's a branch in the maze.
 function getGhostDir(who,howMany,possibilities){
-		possibilities=possibilities.replace(/X/g,"");
-		if (howMany>1){
-			possibilities=excludeOppositeDirection(who,possibilities);
-			howMany--;
-		}
-		if (!onPath[who]) {
-			direction = eval("Math.round(Math.random() *" + howMany + ")");
-			ghostDir[who] = possibilities.charAt(direction);
+
+		dice=Math.round(Math.random() * 6);
+
+		if (!onPath[who] && dice <2){
+			pacLeft = parseInt(divPacman.left)
+			pacTop = parseInt(divPacman.top)
+			ghostDir[who] = headFor(who,Array(pacLeft,pacTop));
+			
 		} else {
-			ghostDir[who] = getPathToHome(who);
+
+			possibilities=possibilities.replace(/X/g,"");
+			if (howMany>1){
+				possibilities=excludeOppositeDirection(who,possibilities);
+				howMany--;
+			}
+			if (!onPath[who]) {
+				direction = eval("Math.round(Math.random() *" + howMany + ")");
+				ghostDir[who] = possibilities.charAt(direction);
+			} else {
+				ghostDir[who] = headFor(who,ghostHomeBase);
+			}
 		}
 }
 
@@ -635,11 +650,9 @@ function excludeOppositeDirection(who,possibilities){
 }
 
 function getPathToHome(who){
-	console.log("Getting path to home at " + ghostHomeBase[0] + "," + ghostHomeBase[1] + " from " + leftG[who] + "," + topG[who]);
 	currentCell = mazedata[parseInt([topG[who]])][parseInt(leftG[who])]
 	console.log(currentCell);
 	home=null;
-
 
 	if (leftG[who] > ghostHomeBase[0] && currentCell.charAt(2)=="L" && ghostDir[who] != "R" && ghostDir[who] != null){
 		home = "L";
@@ -657,11 +670,38 @@ function getPathToHome(who){
 		console.log("Going" + home);	
 	}
 
-
 	console.log(ghostDir[who],topG[who],leftG[who],ghostHomeBase[0],ghostHomeBase[1],currentCell.charAt[0],currentCell.charAt[1],currentCell.charAt[2],currentCell.charAt[3],home);
 	if (!home) { home = ghostDir[who];}
 	return home;
 }
+
+function headFor(who,where){
+	currentCell = mazedata[parseInt([topG[who]])][parseInt(leftG[who])]
+	//console.log(currentCell);
+	home=null;
+
+	if (leftG[who] > where[0] && currentCell.charAt(2)=="L" && ghostDir[who] != "R" && ghostDir[who] != null){
+		home = "L";
+		//console.log("Going" + home);	
+	} else if (leftG[who] <= where[0] && currentCell.charAt(3)=="R" && ghostDir[who] != "L" && ghostDir[who] != null){
+		home = "R";
+		//console.log("Going" + home);	
+	}
+
+	if (topG[who] > where[1] && currentCell.charAt(0)=="U" && ghostDir[who] != "D" && ghostDir[who] != null){
+		home="U";
+		//console.log("Going" + home);	
+	} else if (topG[who] <= where[1] && currentCell.charAt(1)=="D" && ghostDir[who] != "U" && ghostDir[who] != null){
+		home="D";
+		//console.log("Going" + home);	
+	}
+
+	//console.log(ghostDir[who],topG[who],leftG[who],ghostHomeBase[0],ghostHomeBase[1],currentCell.charAt[0],currentCell.charAt[1],currentCell.charAt[2],currentCell.charAt[3],home);
+	if (!home) { home = ghostDir[who];}
+	return home;
+}
+
+
 
 // generates a random direction for a ghost, but not towards pacman (used for when a powerpill is active).
 // NB: The lack of checking whether or not the direction can be made is actually what slows down the ghosts when a pill is on and they are in your line of sight
