@@ -7,7 +7,7 @@
 
 
 // initial settings. these should be increased at around 10000 points?
-var powerPillLifetime=340; // how many iterations the powerpill lasts for - hard is 120
+var powerPillLifetime=120; // how many iterations the powerpill lasts for - hard is 120
 var ghostBlinkLifetime=25; // how long the ghosts blink for within the power pill. Hard is 15.
 var fruitLifetime=95; // how many iterations a piece of fruit stays on screen - hard is 80
 var messageLifetime=1500; // millisecons for the duration of a message (life lost, get ready etc)
@@ -15,33 +15,17 @@ var messageLifetime=1500; // millisecons for the duration of a message (life los
 var pacTimer;
 var ghostsTimer;
 
-if (!top.score){ 
-	top.score = new Object;
-	top.score.level=1;
-	top.score.mode="css";
-	top.score.speed=40;
-	top.score.lives=3;
-	top.score.gameTime=2000;
-	top.score.exlife1 = true;
-	top.score.exlife2 = true;
-	var offScreen="1";
-	var speed=25;
- } 
-
-
-if (document.all){top.main.document.focus();}
-
 // set main variables / images
 var mazecount=0
 var mazeNo=0
 ghimg0 = new Image
-ghimg0.src = 'graphics/ghost1.gif'
+ghimg0.src = 'graphics/ghost_red.gif'
 ghimg1 = new Image
-ghimg1.src = 'graphics/ghost2.gif'
+ghimg1.src = 'graphics/ghost_pink.gif'
 ghimg2 = new Image
-ghimg2.src = 'graphics/ghost3.gif'
+ghimg2.src = 'graphics/ghost_blue.gif'
 ghimg3 = new Image
-ghimg3.src = 'graphics/ghost4.gif'
+ghimg3.src = 'graphics/ghost_orange.gif'
 ghimg5 = new Image
 ghimg5.src = 'graphics/ghost5.gif'
 ghimg6 = new Image
@@ -62,8 +46,8 @@ var ifpil = 0
 var pilcount = 0 // number of pills eaten
 var ppTimer = "0" //counts down from 80 back to 0 when a powerpill is eaten
 var powerpilon = false // set to true when powerpill is eaten, back to false when it wears off
-var lives = top.score.lives
-var score = top.score.score
+var lives = parseInt(sessionStorage.lives)
+var score = parseInt(sessionStorage.score)
 var moving = false
 var newkey = "R" // key just pressed
 var lastkey = "D" // key previously pressed
@@ -71,9 +55,12 @@ var movekey = "D" // active key
 var engage2 = false
 var fruitOn=false
 var fruitTimer=0
-if (top.score){ var speed=top.score.speed } else { var speed=40;}
-if (top.score){ var gameTime=top.score.gameTime; } else { gameTime=5000;}
-if (top.score){ var level = top.score.level; } else { level=1;}
+var speed=sessionStorage.speed;
+var movespeed=speed;
+var ghostspeed=speed; 
+var gameTime=sessionStorage.gameTime;
+var level = sessionStorage.level;
+var resetModeTime=gameTime;
 
 // start positions for levels 1,3,4,5
 var pacStartTop=265
@@ -81,7 +68,7 @@ var pacStartLeft=305
 var ghostStartTop=195
 var ghostStartLeft=305
 
-if (top.score && top.score.level==2) {
+if (sessionStorage && sessionStorage.level==2) {
 	pacStartTop=265
 	pacStartLeft=305
 	ghostStartTop=195
@@ -91,10 +78,10 @@ var ghostscore=50
 var nextfruitscore=score+600
 var thisfruit=0
 var fruitArray = new Array(true,true)
-if (top.score){
-	if (top.score.level==1) offScreen=1
-	if (top.score.level==2 || top.score.level==5) offScreen=2
-	if (top.score.level==3 || top.score.level==4) offScreen=3
+if (sessionStorage){
+	if (sessionStorage.level==1) offScreen=1
+	if (sessionStorage.level==2 || sessionStorage.level==5) offScreen=2
+	if (sessionStorage.level==3 || sessionStorage.level==4) offScreen=3
 } else {
 	offScreen=1;
 }
@@ -103,7 +90,6 @@ if (top.score){
 */
 function init(){
 
-	if (document.all){top.main.document.focus();}
 	ns=(navigator.appName.indexOf('Netscape')>=0)? true:false
 	n6=(document.getElementById && !document.all)? true:false
 	if (n6) {ns=false; document.all=document.getElementsByTagName}
@@ -153,10 +139,10 @@ function init(){
 	vulnerable = new Array (true, true, true, true)
 	onPath = new Array (false, false, false, false)
 
-	if (top.score){
-		if (top.score.level>1){
-			scoreform.forms[0].elements[0].value = top.score.score
-			lifeform.forms[0].elements[1].value = top.score.lives
+	if (sessionStorage){
+		if (sessionStorage.level>1){
+			scoreform.forms[0].elements[0].value = sessionStorage.score
+			lifeform.forms[0].elements[1].value = sessionStorage.lives
 		}
 	}
 
@@ -215,7 +201,7 @@ function ghosts(){
 			ghostDir[wg] = possG[wg].charAt(5)
 			//alert("Ghost" + i + " told to go " + ghostDir[i])
 		} else if (onPath[wg]){
-			console.log("ON A PATH");
+			//console.log("ON A PATH");
 		
 		}
 
@@ -266,14 +252,17 @@ function ghosts(){
 				score -= 50
 				scoreform.forms[0].elements[0].value = score
 				lifeform.forms[0].elements[1].value -= 1
+				resetModeTime = timeform.forms[0].elements[2].value;
 				divMessage.visibility='visible'
 				onPause=1;
-				setTimeout('divMessage.visibility=\'hidden\'; onPause=0; pacTimer = setTimeout("move()",speed); ghostsTimer = setTimeout("ghosts()",speed)',messageLifetime);
+				setTimeout('divMessage.visibility=\'hidden\'; onPause=0; pacTimer = setTimeout("move()",movespeed); ghostsTimer = setTimeout("ghosts()",ghostspeed)',messageLifetime);
 					
 				 if (lives==0) {
 					 divMessEnd.visibility='visible'
 					 onPause=1;
-					 setTimeout('divMessEnd.visibility=\'hidden\'; won=true; top.score.score=score; location="afterplay.html"',messageLifetime);
+					 divMessage.display="none";
+					locStr = "intropage.html?score=" + score;
+					 setTimeout('won=true; sessionStorage.score=score; location=locStr;',messageLifetime);
 				} else {
 					reset()
 				} 
@@ -305,7 +294,10 @@ function ghosts(){
 	}
 
 	//change source of ghost images if powerpill nearly over.
-	if (ppTimer >="1") ppTimer=(ppTimer-1)
+	if (ppTimer >="1") {
+		ppTimer=(ppTimer-1);
+	}
+
 	if (ppTimer == ghostBlinkLifetime) {
 		for(i=0;i<4;i++){
 			if (!onPath[i]) {
@@ -315,15 +307,18 @@ function ghosts(){
 	}
 
 	//return ghost images to normal when powerpill wears off.
-	if (ppTimer == "0" && powerpilon) {powerpilon=false
-	for(i=0;i<4;i++){
-		if (!onPath[i]) {
-			eval ("ghost" + i + "src.src = ghimg" + i + ".src")
-			onPath[i]=false
-			vulnerable[i] = true
-			ghostscore=50
+	if (ppTimer == "0" && powerpilon) {
+		powerpilon=false
+		ghostspeed=speed;
+		movespeed=speed;
+		for(i=0;i<4;i++){
+			if (!onPath[i]) {
+				eval ("ghost" + i + "src.src = ghimg" + i + ".src")
+				onPath[i]=false
+				vulnerable[i] = true
+				ghostscore=50
+			}
 		}
-	}
 	}
 
 	// check to see if a ghost has gone through the channel to the other side of the screen
@@ -346,12 +341,13 @@ function ghosts(){
 		timeform.forms[0].elements[2].value=gameTime
 		alert ("OUT OF TIME! One life lost.")
 		if (lives==0) {
-			alert ("All lives lost - Game Over!! Your score was " + score + " points"); top.score.score = score; location="afterplay.html"} else {
+			locStr = "intropage.html?score=" + score;
+			alert ("All lives lost - Game Over!! Your score was " + score + " points"); sessionStorage.score = score; location=locStr; } else {
 			reset()
 		} 
 
 	}
-	if (!onPause){ ghostsTimer = setTimeout("ghosts()",speed) }
+	if (!onPause){ ghostsTimer = setTimeout("ghosts()",ghostspeed) }
 }
 
 // keydown = invoked if key pressed. First works out which key it is, and translates it to a direction. Four flags are present here - key, newkey, lastkey & movekey. If the key that is pressed (key) is not the same as the previously pressed key (newkey - it was last time round!), then the previously pressed key is stored in lastkey. Movekey is the current movement, and if it's not the same as the key just pressed (key) the value is stored in newkey, and the move function is called if a flag 'moving' is false. This will all make sense later - honest!
@@ -491,35 +487,39 @@ function move(){
 			getnew = putback;
 			if (ns) pilsrc = eval("document.p" + pacLeft + pacTop + ".document")
 			eval("pilsrc.images.pil_" + pacLeft + pacTop + ".src = blank.src")
+
 			if (ifpil==2){
+				ppTimer = powerPillLifetime 
+				ghostscore=50
+				movespeed = speed-10;
+				powerpilon = true
 				for(i=0;i<4;i++){
 					eval ("ghost" + i + "src.src=ghimg5.src")
-					ppTimer = powerPillLifetime 
-					powerpilon = true
 					vulnerable[i]=true
-					ghostscore=50
 				}
 			}
-			ifpil=0; pilcount++
-			score += (10)
+
+			ifpil=0;
+			pilcount++
+			score += 10;
 			scoreform.forms[0].elements[0].value = score
 			if (pilcount>=pillNumber) {
 				won = true
 				onPath[0]=true; onPath[1]=true; onPath[2]=true;onPath[3]=true;
 				document.getElementById("pacman").style.display="none";
-				gameEnd();
+				levelEnd();
 
 			}
 		}
 
-		if (score>=5000 && score <5500 && top.score.exlife1) {
-			lives++; top.score.lives++; scoreform.forms[0].elements[1].value = lives
-			top.score.exlife1=false
+		if (score>=5000 && score <5500 && sessionStorage.exlife1) {
+			lives++; sessionStorage.lives++; scoreform.forms[0].elements[1].value = lives
+			sessionStorage.exlife1=false
 		}
 
-		if (score>=10000 && score <10500 && top.score.exlife2) {
-			lives++; top.score.lives++; scoreform.forms[0].elements[1].value = lives
-			top.score.exlife2=false
+		if (score>=10000 && score <10500 && sessionStorage.exlife2) {
+			lives++; sessionStorage.lives++; scoreform.forms[0].elements[1].value = lives
+			sessionStorage.exlife2=false
 		} 
 
 		//fruit stuff
@@ -544,7 +544,7 @@ function move(){
 
 		moving = true
 		if (!won && !onPause){
-			pacTimer = setTimeout("move()",speed)
+			pacTimer = setTimeout("move()",movespeed)
 		}
 	}
 }
@@ -563,29 +563,60 @@ function showFruit() {
 //generates a random direction for a particular ghost when there's a branch in the maze.
 function getGhostDir(who,howMany,possibilities){
 
+		if (powerpilon){
+			mode="random";
+		} else if (onPath[who]){
+			mode="homing";
+		} else {
+			currentTime = timeform.forms[0].elements[2].value;
+			if (currentTime < resetModeTime-200){ 
+				mode="chase";
+			} else {
+				mode="scatter";
+			}
+		}
+
 		dice=Math.round(Math.random() * 6);
 
-		if (!onPath[who] && dice <2){
-			pacLeft = parseInt(divPacman.left)
-			pacTop = parseInt(divPacman.top)
-			ghostDir[who] = headFor(who,Array(pacLeft,pacTop));
-			
-		} else {
+		if (mode=="scatter" && dice < 7){
 
-			possibilities=possibilities.replace(/X/g,"");
-			if (mazedata[topG[who]][leftG[who]] == "3" && !onPath(who)){// ghosts can only re-enter the home base when on a path to regenerate 
-				possibilities=possibilities.replace(/5/g,"");
+			if (!onPath[who]){
+				     if (who==0){ headLeft = 535; headUp=435;} // red
+				else if (who==1){ headLeft = 35; headUp=35;} // blue
+				else if (who==2){ headLeft = 535; headUp=35;} // pink
+				else if (who==3){ headLeft = 35; headUp=435;} // orange
+				ghostDir[who] = headFor(who,Array(headLeft,headUp));
 			}
-			if (howMany>1){
-				possibilities=excludeOppositeDirection(who,possibilities);
-				howMany--;
+
+		} else if (mode=="chase" && dice < 7){
+
+			if (!onPath[who]){
+				headLeft = parseInt(divPacman.left);
+				headUp= parseInt(divPacman.top);
+				ghostDir[who] = headFor(who,Array(headLeft,headUp));
 			}
-			if (!onPath[who]) {
-				direction = eval("Math.round(Math.random() *" + howMany + ")");
-				ghostDir[who] = possibilities.charAt(direction);
-			} else {
-				ghostDir[who] = headFor(who,ghostHomeBase);
-			}
+
+		} else if (mode=="homing"){
+
+			ghostDir[who] = headFor(who,ghostHomeBase);
+
+		} else { // random
+
+				possibilities=possibilities.replace(/X/g,"");
+				if (mazedata[topG[who]][leftG[who]] == "3" && !onPath(who)){// ghosts can only re-enter the home base when on a path to regenerate 
+					possibilities=possibilities.replace(/5/g,"");
+				}
+				if (howMany>1){
+					possibilities=excludeOppositeDirection(who,possibilities);
+					howMany--;
+				}
+				if (!onPath[who]) {
+					direction = eval("Math.round(Math.random() *" + howMany + ")");
+					ghostDir[who] = possibilities.charAt(direction);
+				} else {
+					ghostDir[who] = headFor(who,ghostHomeBase);
+				}
+
 		}
 }
 
@@ -641,6 +672,9 @@ function getPathToHome(who){
 */
 function headFor(who,where){
 	currentCell = mazedata[parseInt([topG[who]])][parseInt(leftG[who])]
+	if (!currentCell){
+		alert ("NO CURRENT CELL!");
+	}
 	//console.log(currentCell);
 	home=null;
 
@@ -659,9 +693,49 @@ function headFor(who,where){
 		home="D";
 		//console.log("Going" + home);	
 	}
+	if (currentCell.charAt(4)=="3"){ home="U";} // for when ghosts are in the pound
+	
 
 	//console.log(ghostDir[who],topG[who],leftG[who],ghostHomeBase[0],ghostHomeBase[1],currentCell.charAt[0],currentCell.charAt[1],currentCell.charAt[2],currentCell.charAt[3],home);
-	if (!home) { home = ghostDir[who];}
+	if (!home) { 
+		
+		possibilities=currentCell.substr(0,4).replace(/X/g,"");
+
+		if (possibilities.length==2){
+			if (ghostDir[who]=="R" || ghostDir[who]=="L"){
+			console.log("LEFT OR RIGHT",currentCell);
+				if (currentCell.charAt(0)=="U"){ 
+					home = "U";
+				 } else if (currentCell.charAt(1)=="D"){
+					home = "D";
+				} else if (currentCell.charAt(2)=="L"){
+					home = "L";
+				} else {
+					home = "R";
+				}
+			} else  if (ghostDir[who]=="D" || ghostDir[who]=="U"){
+				console.log("UP POR DOWN");
+				if (currentCell.charAt(2)=="L"){ 
+					home = "L";
+				 } else if (currentCell.charAt(3)=="R"){
+					home = "R";
+				 } else if (currentCell.charAt(0)=="U"){
+					home = "U";
+				} else {
+					home="D";
+				}
+			} 
+		}
+	}
+
+	if (!home) {
+			istr = "nowhere to go for " + who + " heading " + ghostDir[who] + " in mode of " + mode;
+			istr = istr + " to " + where[0] + "," + where[1];
+			istr = istr + " from " 
+			istr = istr + leftG[who] + "," + topG[who] + ""; 
+			console.log(istr);
+			home = ghostDir[who];
+	}
 	return home;
 }
 
@@ -681,8 +755,21 @@ function getTrueDir(who,not){
 
 //resets all positions, image sources and directions if a life is lost
 function reset(){
+
+	if (pacTimer){ clearTimeout(pacTimer);}
+	if (ghostsTimer){ clearTimeout(ghostsTimer);}
+	if (gameTimer){ clearTimeout(gameTimer);}
+
 	divPacman.top=pacStartTop
 	divPacman.left=pacStartLeft
+
+	document.getElementById("pacman").style.display="block";
+	document.getElementById("pacman").classList.remove("pacman_U");
+	document.getElementById("pacman").classList.remove("pacman_D");
+	document.getElementById("pacman").classList.remove("pacman_L");
+	document.getElementById("pacman").classList.add("pacman_R");
+
+	won=false;
 	pacLeft = parseInt(divPacman.left)
 	pacTop = parseInt(divPacman.top)
 
@@ -760,8 +847,9 @@ function intelligence(g){
 }
 
 // flash maze at end of level. Also should kill the move timeouts here really
-function gameEnd(){
+function levelEnd(){
 
+	pilcount=0;
 
 	if (mazeNo==2) mazeNo=0
 	mazeCells = document.getElementsByClassName("wallCell");
@@ -782,21 +870,59 @@ function gameEnd(){
 	mazeNo++
 	mazecount++
 	if (mazecount<12) {
-		mazeFlashTimer=setTimeout ("gameEnd()",300)
+		mazeFlashTimer=setTimeout ("levelEnd()",300)
 	} else {
-		top.score.score=score
-		top.score.lives = lives
-		top.score.level++
-		if (top.score.level==10){
-			top.score.level=1
-			if (top.score.speed>=5){top.score.speed=top.score.speed-5;}
+		sessionStorage.score=score
+		sessionStorage.lives = lives
+		sessionStorage.level++
+		mazecount=0;
+		if (sessionStorage.level==10){
+			sessionStorage.level=1
+			if (sessionStorage.speed>=5){sessionStorage.speed=sessionStorage.speed-5;}
 		}
-		eval ("location='pacman_" + top.score.level + ".html'")
+		loadLevel(sessionStorage.level);
 	}
-
 }
 
+function dynLoader(url, callback){
+    // Adding the script tag to the head as suggested before
+    var head = document.getElementsByTagName('head')[0];
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url;
+
+    // Then bind the event to the callback function.
+    // There are several events for cross browser compatibility.
+    script.onreadystatechange = callback;
+    script.onload = callback;
+
+    // Fire the loading
+    head.appendChild(script);
+}
+
+var startNewLevel = function (){
+	mazedata = renderGrid();
+	onPause=1;
+	timeform.forms[0].elements[2].value=gameTime
+	reset();
+	start();
+}
+var renderNewData = function() {
+	dynLoader("js/maze.js",startNewLevel);
+}
+
+function loadLevel(level){
+	//eval ("location='pacman_" + sessionStorage.level + ".html'")
+	moving = false;
+	dataFile = "js/data/mazedata" + level + ".js";
+	dynLoader(dataFile,renderNewData);
+}
+
+
 function start(){
+	onPause=0;
+	document.getElementById("levelIndicator").innerHTML = "Level " + sessionStorage.level;
+	divStart.visibility="visible";
 	gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',messageLifetime) 
 }
 
