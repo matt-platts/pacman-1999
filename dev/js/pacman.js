@@ -58,6 +58,8 @@ var ppTimer = "0" //counts down from 80 back to 0 when a powerpill is eaten
 var powerpilon = false // set to true when powerpill is eaten, back to false when it wears off
 var lives = parseInt(sessionStorage.lives)
 var score = parseInt(sessionStorage.score)
+var exlife1 = sessionStorage.exlife1;
+var exlife2 = sessionStorage.exlife;
 var moving = false
 var newkey = "R" // key just pressed
 var lastkey = "D" // key previously pressed
@@ -581,13 +583,13 @@ function move(){
 		}
 
 		// Give extra lives at 5000 and 1000 points. As points may increment considerably on a single cell (although rare) 1000 points leeway for checking is left. 
-		if (score>=5000 && score <6000 && sessionStorage.exlife1) {
+		if (score>=50 && score <6000 && exlife1) {
+			exlife1=0; sessionStorage.exlife1 = 0;
 			lives++; sessionStorage.lives = lives; scoreform.forms[0].elements[1].value = lives;
-			sessionStorage.exlife1 = false;
 		}
-		if (score>=10000 && score <10500 && sessionStorage.exlife2) {
+		if (score>=10000 && score <10500 && exlife2) {
+			exlife2=0; sessionStorag.exlife=0;
 			lives++; sessionStorage.lives++; scoreform.forms[0].elements[1].value = lives;
-			sessionStorage.exlife2=false
 		} 
 
 		// show a piece of fruit at certain times - based on incrementing score with a length in a decrementing var called fruitTimer
