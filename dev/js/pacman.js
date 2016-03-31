@@ -279,7 +279,15 @@ function ghosts(){
 
 		// Collision detectoin
 		// If so, either send the ghost home, or lose a life, depending whether a powerpill is currently active. 
-		if (pacLeft > leftG[wg]-20 && pacLeft < leftG[wg]+20 && pacTop > topG[wg]-20 && pacTop< topG[wg]+20){
+		if (ppTimer > 1){
+			closeness_allowed=20;
+		} else {
+			closeness_allowed=30;
+		}
+
+		if (pacLeft > leftG[wg]-20 && pacLeft < leftG[wg]+20 && pacTop > topG[wg]-20 && pacTop < topG[wg]+20 && 
+			(pacLeft == leftG[wg] || pacTop == topG[wg])) // this ensures not on a corner, as the closeness is not correct - pacman makes a move down and the ghost goes accross and therefore matches with the rest of the equation - which we don't want - it means you can't get away. 
+			{
 
 			//if no Powerpill and game not won and ghost not on path, you've lost a life
 			//or pill is on but ghost is not vulnerable then same
