@@ -299,6 +299,12 @@ function ghosts(){
 				scoreform.forms[0].elements[0].value = score
 				lifeform.forms[0].elements[1].value -= 1
 				resetModeTime = timeform.forms[0].elements[2].value;
+		ghostReleaseTime = timeform.forms[0].elements[2].value;
+		ghostDelayRelease=Array(); // used to delay the release of each ghost
+		for (i=0;i<4;i++){
+			ghostDelayRelease[i] = ghostReleaseTime - i*15;
+			console.log(ghostDelayRelease[i]);
+		}
 				divMessage.visibility='visible'
 				onPause=1;
 				setTimeout('divMessage.visibility=\'hidden\'; onPause=0; pacTimer = setTimeout("move()",movespeed); ghostsTimer = setTimeout("ghosts()",ghostspeed)',messageLifetime);
@@ -583,7 +589,7 @@ function move(){
 		}
 
 		// Give extra lives at 5000 and 1000 points. As points may increment considerably on a single cell (although rare) 1000 points leeway for checking is left. 
-		if (score>=50 && score <6000 && exlife1) {
+		if (score>=5000 && score <6000 && exlife1) {
 			exlife1=0; sessionStorage.exlife1 = 0;
 			lives++; sessionStorage.lives = lives; scoreform.forms[0].elements[1].value = lives;
 		}
@@ -641,22 +647,31 @@ function showFruit() {
 */
 function generateGhostDir(who,howMany,possibilities){
 
+		currentTime = timeform.forms[0].elements[2].value;
+
 		if (powerpilon){
 			mode="random";
 		} else if (onPath[who]){
 			mode="homing";
 		} else {
-			currentTime = timeform.forms[0].elements[2].value;
 			if (currentTime < resetModeTime-scatterTime){ 
+				if (mode != "chase"){ scatterTime = scatterTime - 50; }
 				mode="chase";
 			} else {
 				mode="scatter";
 			}
 		}
+		if (ghostDelayRelease[who] < currentTime){
+			ghostMode="sit";
+		} else {
+			ghostMode=mode;
+		}
+		
+		//console.log(mode,resetModeTime);
 
 		dice=Math.round(Math.random() * 6);
 
-		if (mode=="scatter" && dice < 7){
+		if (ghostMode=="scatter" && dice < 7){
 
 			if (!onPath[who]){
 				     if (who==0){ headLeft = 535; headUp=435;} // red
@@ -666,7 +681,7 @@ function generateGhostDir(who,howMany,possibilities){
 				ghostDir[who] = headFor(who,Array(headLeft,headUp));
 			}
 
-		} else if (mode=="chase" && dice < 7){
+		} else if (ghostMode=="chase" && dice < 7){
 
 			if (!onPath[who]){
 				headLeft = parseInt(divPacman.left);
@@ -674,11 +689,11 @@ function generateGhostDir(who,howMany,possibilities){
 				ghostDir[who] = headFor(who,Array(headLeft,headUp));
 			}
 
-		} else if (mode=="homing"){
+		} else if (ghostMode=="homing"){
 
 			ghostDir[who] = headFor(who,ghostHomeBase);
 
-		} else { // random
+		} else if (ghostMode=="random") { // random
 
 				possibilities=possibilities.replace(/X/g,"");
 				if (mazedata[topG[who]][leftG[who]] == "3" && !onPath(who)){// ghosts can only re-enter the home base when on a path to regenerate 
@@ -695,6 +710,13 @@ function generateGhostDir(who,howMany,possibilities){
 					ghostDir[who] = headFor(who,ghostHomeBase);
 				}
 
+		} else if (ghostMode=="sit"){
+			direction=Math.round(Math.random() * 1);
+			if (direction==0){ ghostDir[who]=possibilities.charAt(2); } else { ghostDir[who]=possibilities.charAt(3);}
+			ghostDir[who] = headFor(who,ghostHomeBase);
+		}
+		if (who==3){
+		console.log(ghostDir[who]);
 		}
 }
 
@@ -715,33 +737,6 @@ function excludeOppositeDirection(who,possibilities){
 		possibilities=possibilities.replace(/D/,"");
 	}
 	return possibilities;
-}
-
-/* DEPRECATED - use headFOR instead with the home co-ordinates as the second param */
-function getPathToHome(who){
-	currentCell = mazedata[parseInt([topG[who]])][parseInt(leftG[who])]
-	console.log(currentCell);
-	home=null;
-
-	if (leftG[who] > ghostHomeBase[0] && currentCell.charAt(2)=="L" && ghostDir[who] != "R" && ghostDir[who] != null){
-		home = "L";
-		console.log("Going" + home);	
-	} else if (leftG[who] <= ghostHomeBase[0] && currentCell.charAt(3)=="R" && ghostDir[who] != "L" && ghostDir[who] != null){
-		home = "R";
-		console.log("Going" + home);	
-	}
-
-	if (topG[who] > ghostHomeBase[1] && currentCell.charAt(0)=="U" && ghostDir[who] != "D" && ghostDir[who] != null){
-		home="U";
-		console.log("Going" + home);	
-	} else if (topG[who] <= ghostHomeBase[1] && currentCell.charAt(1)=="D" && ghostDir[who] != "U" && ghostDir[who] != null){
-		home="D";
-		console.log("Going" + home);	
-	}
-
-	console.log(ghostDir[who],topG[who],leftG[who],ghostHomeBase[0],ghostHomeBase[1],currentCell.charAt[0],currentCell.charAt[1],currentCell.charAt[2],currentCell.charAt[3],home);
-	if (!home) { home = ghostDir[who];}
-	return home;
 }
 
 /* 
@@ -1023,6 +1018,7 @@ var renderNewData = function() {
 */
 function loadLevel(level){
 	//eval ("location='pacman_" + sessionStorage.level + ".html'")
+	resetModeTime=2000;
 	moving = false;
 	dataFile = "js/data/mazedata" + level + ".js";
 	dynLoader(dataFile,renderNewData);
@@ -1030,9 +1026,16 @@ function loadLevel(level){
 
 /*
  * Function: start
- * Meta: At the start of each level, display the message and kick off the game timers
+ * Meta: At the start of each level, or after losing a life, display the message and kick off the game timers
 */
 function start(){
+	mode="scatter";
+	ghostReleaseTime = timeform.forms[0].elements[2].value;
+	ghostDelayRelease=Array(); // used to delay the release of each ghost
+	for (i=0;i<4;i++){
+		ghostDelayRelease[i] = ghostReleaseTime - i*47;
+		console.log(ghostDelayRelease[i]);
+	}
 	onPause=0;
 	document.getElementById("levelIndicator").innerHTML = "Level " + sessionStorage.level;
 	divStart.visibility="visible";
