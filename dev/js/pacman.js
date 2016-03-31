@@ -1,3 +1,11 @@
+/* 
+ * File: pacman.js
+ * Meta: game logic
+ * Note: development very much in progress - rewrite imminent.
+*/
+
+
+// NOTES: 
 // Look for the text HACK2016 in the code - this means I changed something without fully understanding the implications (it's old code)
 // Specifically - checking that possG[wg] exists before trying to read a charAt. I *think* it is because the maze data isn't populated with zeros and the ghost path information isn't in the maze data, so this hack should be removed when the data set is completed.
 
@@ -88,7 +96,9 @@ if (sessionStorage){
 	offScreen=1;
 }
 /* Function: init
- * Meta: init() is called from onload, init() defines arrays for later use, then calls the ghosts() function and the move() funcion for the first time, to set them off. These functions then repeatedly call themselves on a timeout command (nb: move is also called from keydown events - we don't want to wait!).
+ * Meta: init() was originally called from the body onLoad, now it is called after the dynamically loaded javascript maze for the first level. 
+ *       init() sets up cross-browser pointer variables, defines several arrays for later use, then calls start function to kick off the level itself. 
+ *       This is only required for the first level of the game.
 */
 function init(){
 
@@ -161,41 +171,52 @@ function init(){
 	start();
 }
 
+/* 
+ * Function: ghosts
+ * Meta: Deals with the ghosts movements on a recurring timer as one of the main game loops. 
+ *       Collision detection is also a part of this loop and not a part of move.
+ * 
+*/
 function ghosts(){
 
-	//possG is the possible moves for each ghost, based on its co-ordinates of the mazedata array 
+	// The movement functions are run four times in a loop - once for each ghost
 	for (wg=0;wg<4;wg++){
-		//possG[wg] = eval ("mazedata[topG[" + wg + "]].left" + parseInt(leftG[wg]))
+		// 1. Load the possible moves from the mazedata array into the possG array. 
+		//   All the data for all the ghosts is used later (collision detection) hence the array. 
 		possG[wg] = mazedata[topG[wg]][parseInt(leftG[wg])];
 
-		//check possibile moves. The ghostData array contains info on which moves are possible. If more than 3 directions are present, or only 1 (ie backwards, so dead end) - a new direction must be generated...
+		// 2. Check possibile moves. The ghostData array contains info on which moves are possible. 
+		//    If more than 2 directions are present, or only 1 (ie backwards, so dead end) - a new direction must be generated...
 		totalDirections=0 // counters for each ghost
 		for (n=0;n<4;n++){
 		ghostData[n]=0
 		if (possG[wg] && possG[wg].charAt(n) != "X") { // HACK2016
-			ghostData[n] = "8"
+			ghostData[n] = "8" // the 8 is a random otherwise unused character, just need something for checking in section 4 below
 			totalDirections++;
 		} else {
 			ghostData[n] = n}
 		}
 
-		// get ghost direction where there are 1 or more than two directions
-		if (totalDirections>2 || totalDirections==1) getGhostDir(wg,totalDirections,possG[wg])
+		// 3. Call function to get ghost direction where there are 1 or more than two directions
+		if (totalDirections>2 || totalDirections==1) generateGhostDir(wg,totalDirections,possG[wg])
 
-		// if there's 2 directions only, the '8' added above is used to ascertain if they are opposite directions (eg Left & Right) or not. 
+		// 4. if there's 2 directions only, need to ascertain if they are 180 or 90 degrees. 
+		// The '8' added above is used to ascertain if they are opposite directions (eg Left & Right) or not. 
 		// If they're opposite, obviously the previous direction will apply.
 		// If they're at right angles (No cases of 2 8's next to each other) a new direction must be generated.
 		firstPair = false; secPair = false
 		if (totalDirections==2) {
 			if (ghostData[0] == ghostData[1]) firstPair = true
 			if (ghostData[2] == ghostData[3]) secPair = true
-			if (!firstPair && !secPair) getGhostDir(wg,totalDirections,possG[wg])
+			if (!firstPair && !secPair) { generateGhostDir(wg,totalDirections,possG[wg]);}  // don't have any pairs so it's right angles
 		}
 
 		// if basicVision is set, and ghost is not onPath to home, compare ghost positions to your position & if it can see you, adjust direction.
-		if (!onPath[wg] && basicVision === true) { intelligence(wg) }
+		if (!onPath[wg] && basicVision === true) { checkBasicVision(wg) }
 
-		//for each ghost, if ghostDir (current direction) is in the possG array (the move is possible) then a flag to engage the ghost (engGhost) is set to true. Otherwise (move not possible) engGhost (engage ghost) is set to false. Thus, the ghost is only engaged if it can make the move. NB: Ghost is also engaged if onPath is true, as it knows where it's going (onPath means the ghost has been eaten and is on a path to the base.. - this path is coded into the mazedata array)
+		// For each ghost, if ghostDir (current direction) is in the possG array (the move is possible) then a flag to engage the ghost (engGhost) is set to true. 
+		// Otherwise (move not possible) engGhost (engage ghost) is set to false. Thus, the ghost is only engaged if it can make the move. 
+		// NB: Ghost is also engaged if onPath is true, as it knows where it's going (onPath means the ghost has been eaten and is on a path to the base.. - this path is coded into the mazedata array)
 
 		//status = (wg + "--" + possG[wg]) //status bar for error checking
 		if (!possG[wg]){ possG[wg]="0";} // HACK2016
@@ -222,7 +243,8 @@ function ghosts(){
 
 		// We store ghost positions so can be compared to positions next time round. If same, generate new direction. 
 		// This is to over-ride when they stick if they're following you and you move out of the way, as there's nothing else to tell them to generate a new direction.
-		if (preGtop[wg] == topG[wg] && preGleft[wg] == leftG[wg]) getGhostDir(wg,totalDirections,possG[wg])
+		// update 2016 - this is NONSENSE! Need to generate a proper direction now I have the speed sorted!
+		if (preGtop[wg] == topG[wg] && preGleft[wg] == leftG[wg]) generateGhostDir(wg,totalDirections,possG[wg])
 		preGtop[wg] = topG[wg]
 		preGleft[wg] = leftG[wg]
 		
@@ -235,8 +257,8 @@ function ghosts(){
 			if (ghostDir[wg] == "R") {leftG[wg] = (leftG[wg]+10); eval ("divGhost" + wg + ".left = leftG[wg]")}
 		}
 
-		// for the path stuff... if it goes off the maze (er.. this means there is an error somehow int the mazedata array!), then immediately return to home.
-		if (onPath[wg]) {
+		// For the path stuff... if it goes off the maze (er.. this means there is an error somehow int the mazedata array!), then immediately return to home.
+		if (onPath[wg]){
 			if (topG[wg]>=446 || topG[wg] <=35 || leftG[wg]<=25 || leftG[wg] >=591) {
 				eval ("divGhost" + wg + ".left = ghostStartLeft")
 				eval ("divGhost" + wg + ".top = ghostStartTop")
@@ -248,10 +270,10 @@ function ghosts(){
 			}
 			// and if it's home, reset it to not vulnerable and back to correct image
 			if (leftG[wg] == ghostHomeBase[0] && topG[wg] == ghostHomeBase[1]){
-			if (!won){onPath[wg] = false;}
-			vulnerable[wg] = false;
-			eval ("ghost" + wg + "src.src=ghimg" + wg + ".src")
-			ghostDir[wg] = "U"
+				if (!won){ onPath[wg] = false; }
+				vulnerable[wg] = false;
+				eval ("ghost" + wg + "src.src=ghimg" + wg + ".src")
+				ghostDir[wg] = "U"
 			}
 		}
 
@@ -292,7 +314,7 @@ function ghosts(){
 		}
 	}
 
-	//change source of ghost images if powerpill nearly over.
+	// Decrement the power pill timer, and change source of ghost images if powerpill nearly over.
 	if (ppTimer >="1") {
 		ppTimer=(ppTimer-1);
 	}
@@ -305,7 +327,7 @@ function ghosts(){
 		}
 	}
 
-	//return ghost to normal when powerpill wears off.
+	// Return ghost to normal when powerpill wears off.
 	if (ppTimer == "0" && powerpilon) {
 		powerpilon=false
 		ghostspeed=speed;
@@ -320,7 +342,7 @@ function ghosts(){
 		}
 	}
 
-	// check to see if a ghost has gone through the channel to the other side of the screen
+	// Check to see if a ghost has gone through the channel to the other side of the screen
 	for (i=0;i<4;i++){
 		ghostPos = mazedata[topG[i]][parseInt(leftG[i])];
 		if (ghostPos && (ghostPos.charAt(2)=="O" || ghostPos.charAt(3)=="O")){
@@ -329,8 +351,8 @@ function ghosts(){
 		}
 	}
 
-	//intelligence()
-	// timer
+	//checkBasicVision()
+	// Game timer on the screen.. 
 	timeform.forms[0].elements[2].value--
 	if (timeform.forms[0].elements[2].value==0){
 		lives = (lives-1)
@@ -347,10 +369,16 @@ function ghosts(){
 		} 
 
 	}
-	if (!onPause){ ghostsTimer = setTimeout("ghosts()",ghostspeed) }
+
+	// And finally, call the function again if the game isn't paused
+	if (!onPause){ ghostsTimer = setTimeout("ghosts()",ghostspeed);}
 }
 
-// keydown = invoked if key pressed. First works out which key it is, and translates it to a direction. Four flags are present here - key, newkey, lastkey & movekey. If the key that is pressed (key) is not the same as the previously pressed key (newkey - it was last time round!), then the previously pressed key is stored in lastkey. Movekey is the current movement, and if it's not the same as the key just pressed (key) the value is stored in newkey, and the move function is called if a flag 'moving' is false. This will all make sense later - honest!
+/* Function: kd
+ * Meta: keydown = invoked if key pressed. 
+ *       if the game is paused and P has been pressed again to unpause, the unpause happens here by kicking off the game timers.
+ *       for any other key logic is more complex and it is passed to keyLogic
+*/
 function kd(e){
 
 	if (onPause){
@@ -365,10 +393,8 @@ function kd(e){
 			onPause=0;
 			move(); ghosts();
 		}
-		//gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',speed) 
-		//if (!ghostsTimer){ ghostsTimer = setTimeout("ghosts()",speed); }
-	} else {
 
+	} else {
 		if (keycount>=2) {keycount=0; movekey="Q"; if (!moving) move()}
 		if (document.all && !document.getElementById){key = window.event.keyCode}
 		if (document.getElementById){ key = e.keyCode}
@@ -384,7 +410,33 @@ function kdns(evt){
 	keyLogic(key);
 }
 	
-
+/*
+ * Function: keyLogic
+ * Meta: First works out which key it is, and translates it to a direction (or performs the pause or reset action). 
+ *       Four flags are present here - key, newkey, lastkey & movekey.
+ *		key - this contains the key that has just been pressed resulting in this funciton being called, which 
+ * 		is immediately translated to upper case ASCII via it's ord value
+ * 		movekey - this is the key which generated the current movement. The movement has the same upper case ASCII
+ *  			  char value as the key pressed so it is easily compared.
+ * 		newkey - If the key which has been pressed is a movement key but NOT the same direction as pacman is 
+ * 			 currently heading, newkey is set to the incoming key, and keycount is incremented. This new key
+ * 			 *will be* the next direction that pacman takes assuming the move is possible - it is stored for 
+ * 			 if that occasion arises. 
+ * 			 No action is taken if it is the same key as the current movement - ther eis no need.
+ * 		lastkey - this is the last key to be used which changed the direction of pacman, and consequently indicates 
+ *			  the direction in which he is currently traelling (which possibly makes this var redundant!
+ *
+ * 	 All of this data is picked up by the continually looping move function which contains inline explanations of what
+ *	 is going on.
+ *
+ * 	 Some kind of explanation at deciphering my 17 year old logic follows:
+ *       If the key that is pressed (key) is not the same as the previously pressed key (newkey - it *was* last time round!), 
+ *       then that previously pressed key is stored in lastkey. This signifies that a new movement is waiting to happen when it can.
+ * 	 Movekey is the current movement, and if it's not the same as the key just pressed (key) the value is stored in newkey, 
+ * 	 and the move function is called if a flag 'moving' is false. move() itself is on a timer, but we don't wna to wait. 
+ * 	 The keycount variable is also incremented. 
+ * 	 Hmm no that didn't really help either did it..
+*/
 function keyLogic(key){
 
 	// movement kreys (aznm or cursor keys)
@@ -393,7 +445,7 @@ function keyLogic(key){
 	if (key=="78" || key=="110" || key == "37") {key="L"}
 	if (key=="77" || key=="109" || key == "39") {key="R"}
 
-	// game reste key (r)
+	// game reset key (r)
 	if (key=="82" || key=="114"){ top.location.reload();} // r = reset
 	
 	// game pause key (p)
@@ -409,48 +461,61 @@ function keyLogic(key){
 
 }
 
-/* Function : ku
+/* 
+ * Function : ku
  * Meta: decreases keycount by one as a key goes up
 */
 function ku(e){
 	keycount--;
 }
 
-//function controls movement of pacman
+/*
+ * Function: move
+ * Meta: This is one of the two continually looping functions which make up the two game loops. 
+ *       It accesses the newkey, lastkey and movekey variables from the keyLogic function, which it compares to 
+ * 	 data of possible moves from the mazedata array where pacman currently resides.
+*/
 function move(){
 
+	// 1. Look up the possible moves from the current position
 	possibilities = mazedata[pacTop][pacLeft];
 	u = possibilities.charAt(0)
 	d = possibilities.charAt(1)
 	l = possibilities.charAt(2)
 	r = possibilities.charAt(3)
 
+	// 2. If the latest key press has generated a character in the possible moves array, set 'engage', set the movekey var to this key, and also the lastkey var
 	if (newkey==u || newkey==d || newkey ==l || newkey == r) {
 
 		engage=true; movekey = newkey; lastkey = newkey // lastkey set to stop constant repetition of last 2 moves without the user touching anything.. see later on.
 
 	} else {
 
+		// 2.1 If previously pressed key generated a character that exists in the possible moves array then we can use that to continue in that direction
 		if (lastkey==u || lastkey==d || lastkey==l || lastkey==r) {
 			engage = true
 			movekey = lastkey
 
+		// 2.2 The latest and last key presses do not match a possible direction - therefore pacman stops. 'engage' and 'moving' set to false
 		} else {
 			engage = false
 			moving = false
 		}
 	}
-	//status = possibilities + "," + pacTop + "-" + pacLeft + "," + u + d + l + r + "- " + engage
 
+	// 3. Engage is now set if a move can be made. This is either off the new key the previously pressed key, it doesn't matter as we make that move.
 	if (engage) {
 
-		newClass = "pacman_" + newkey;
-		document.getElementById("pacman").classList.remove("pacman_U");
-		document.getElementById("pacman").classList.remove("pacman_D");
-		document.getElementById("pacman").classList.remove("pacman_L");
-		document.getElementById("pacman").classList.remove("pacman_R");
-		document.getElementById("pacman").classList.add(newClass);
+		if (movekey==newkey) { // 4. This means the latest key press and not the previous one generated this move, so we update the icon to point the right way
+			newClass = "pacman_" + newkey;
+			document.getElementById("pacman").classList.remove("pacman_U");
+			document.getElementById("pacman").classList.remove("pacman_D");
+			document.getElementById("pacman").classList.remove("pacman_L");
+			document.getElementById("pacman").classList.remove("pacman_R");
+			document.getElementById("pacman").classList.add(newClass);
+		}
 
+		// 5. Move the sprite on screen to correspond to the direction
 		if (movekey==u) {divPacman.top=(pacTop-10); pacTop=pacTop-10}
 		if (movekey==d) {divPacman.top=(pacTop+10); pacTop=pacTop+10}
 		if (movekey==l) {divPacman.left=(pacLeft-10);pacLeft=pacLeft-10}
@@ -461,23 +526,25 @@ function move(){
 		//console.log("Top: " + pacTop + " Left: " + pacLeft);
 		//console.log(mazedata);
 		//console.log(mazedata[pacTop][pacLeft]);
-		getnew = mazedata[pacTop][pacLeft];
-		if (getnew.length>=5) { ifpil = getnew.charAt(4)} else {ifpil = 0}
+
+		// 6. The var newLocationData is the data for the cell we've just moved into. We may need to process a pill being eaten..
+		newLocationData = mazedata[pacTop][pacLeft];
+		if (newLocationData.length>=5) { ifpil = newLocationData.charAt(4)} else {ifpil = 0}
 		if (ifpil=="1" || ifpil=="2") {
-			pb0 = getnew.charAt(0)
-			pb1 = getnew.charAt(1)
-			pb2 = getnew.charAt(2)
-			pb3 = getnew.charAt(3)
+			pb0 = newLocationData.charAt(0)
+			pb1 = newLocationData.charAt(1)
+			pb2 = newLocationData.charAt(2)
+			pb3 = newLocationData.charAt(3)
 			pb4 = "0"
-			if (getnew.length==6) {
-				pb5=getnew.charAt(5)
+			if (newLocationData.length==6) {
+				pb5=newLocationData.charAt(5)
 				putback = eval ("pb0+pb1+pb2+pb3+pb4+pb5")
 				} else {
 				putback = eval ("pb0+pb1+pb2+pb3+pb4")
 				}
 			//eval ("mazedata[pacTop]." + newleftamt + "= putback")
 			mazedata[pacTop][pacLeft] = putback
-			getnew = putback;
+			newLocationData = putback;
 			if (ns) pilsrc = eval("document.p" + pacLeft + pacTop + ".document")
 			eval("pilsrc.images.pil_" + pacLeft + pacTop + ".src = blank.src")
 
@@ -505,18 +572,18 @@ function move(){
 			}
 		}
 
-		if (score>=5000 && score <5500 && sessionStorage.exlife1) {
-			lives++; sessionStorage.lives++; scoreform.forms[0].elements[1].value = lives
-			sessionStorage.exlife1=false
+		// Give extra lives at 5000 and 1000 points. As points may increment considerably on a single cell (although rare) 1000 points leeway for checking is left. 
+		if (score>=5000 && score <6000 && sessionStorage.exlife1) {
+			lives++; sessionStorage.lives = lives; scoreform.forms[0].elements[1].value = lives;
+			sessionStorage.exlife1 = false;
 		}
-
 		if (score>=10000 && score <10500 && sessionStorage.exlife2) {
-			lives++; sessionStorage.lives++; scoreform.forms[0].elements[1].value = lives
+			lives++; sessionStorage.lives++; scoreform.forms[0].elements[1].value = lives;
 			sessionStorage.exlife2=false
 		} 
 
-		//fruit stuff
-		if (score>=nextfruitscore && score <=nextfruitscore+300 && fruitArray[thisfruit]) {showFruit()}
+		// show a piece of fruit at certain times - based on incrementing score with a length in a decrementing var called fruitTimer
+		if (score >= nextfruitscore && score <=nextfruitscore+300 && fruitArray[thisfruit]) {showFruit()}
 		if (fruitTimer>0) fruitTimer--
 		if (fruitTimer==1) {
 			divFruit.visibility='hidden'; fruitOn=false
@@ -529,8 +596,8 @@ function move(){
 			divFruit.visibility='hidden'
 		}
 
-		// offside bit - if you go off the screen it puts you to the opposite side.
-		if (getnew.charAt(2)=="O" || getnew.charAt(3)=="O"){
+		// For the tunnels off the side of the mazes, many need to update location of pacman 
+		if (newLocationData.charAt(2)=="O" || newLocationData.charAt(3)=="O"){
 			if (pacLeft==35){ pacLeft=555; divPacman.left=pacLeft; }
 			if (pacLeft==575){ pacLeft=55; divPacman.left=pacLeft; }
 		}
@@ -542,6 +609,10 @@ function move(){
 	}
 }
 
+/*
+ * Function: showFruit
+ * Meta: displays a piece of fruit to the screen, sets fruitOn flag and sets up the criterea for the next one appearing
+*/
 function showFruit() {
 	nextfruitscore+=600
 	thisfruit++
@@ -553,8 +624,12 @@ function showFruit() {
 	divFruit.visibility='visible'
 }
 
-//generates a random direction for a particular ghost when there's a branch in the maze.
-function getGhostDir(who,howMany,possibilities){
+
+/*
+ * Function: generateGhostDir
+ * Meta: Generates a new direction for a particular ghost 
+*/
+function generateGhostDir(who,howMany,possibilities){
 
 		if (powerpilon){
 			mode="random";
@@ -613,7 +688,9 @@ function getGhostDir(who,howMany,possibilities){
 		}
 }
 
-/* removes the opposite direction from the list of possible moves - no point in going back where we've just come fron - keeps them moving */
+/* Function excludeOppositeDirection
+ * Meta: Removes the opposite direction from the list of possible moves - no point in going back where we've just come fron - keeps them moving around 
+*/
 function excludeOppositeDirection(who,possibilities){
 	if (ghostDir[who]=="R"){
 		possibilities=possibilities.replace(/L/,"");
@@ -734,19 +811,25 @@ function headFor(who,where){
 
 
 
-// generates a random direction for a ghost, but not towards pacman (used for when a powerpill is active).
-// NB: The lack of checking whether or not the direction can be made is actually what slows down the ghosts when a pill is on and they are in your line of sight
-// Although not programatically brilliant, it worked for the game in an 'off label' kind of way, so it got left. 
-function getTrueDir(who,not){
+/*
+ * Function: getBasicVisionDir
+ * Meta: Get a direction based on the basic vision feature, used in the checkBasicVision function
+ * NB: The lack of checking whether or not the direction can be made is actually what slows down the ghosts when a pill is on and they are in your line of sight
+ * Although not programatically brilliant, it worked for the game in an 'off label' kind of way, so it got left. 
+*/
+function getBasicVisionDir(who,not){
 	ghostDir[wg] = Math.round(Math.random() *3)
 	if (ghostDir[wg] == "0") {ghostDir[wg] = "U"}
 	if (ghostDir[wg] == "1") {ghostDir[wg] = "D"}
 	if (ghostDir[wg] == "2") {ghostDir[wg] = "L"}
 	if (ghostDir[wg] == "3") {ghostDir[wg] = "R"}
-	if (ghostDir[wg] == not) {getTrueDir(wg,not)}
+	if (ghostDir[wg] == not) {getBasicVisionDir(wg,not)}
 }
 
-//resets all positions, image sources and directions if a life is lost
+/*
+ * Function: reset
+ * Meta: Resets all positions, image sources and directions if a life is lost
+*/
 function reset(){
 
 	if (pacTimer){ clearTimeout(pacTimer);}
@@ -781,65 +864,70 @@ function reset(){
 }
 
 /* 
-  Function : intelligence 
-  Meta: Gives the ghosts a bit of thinking power. If there's a clear line between them and you, this function will change their direction to move towards you, unless a powerpill is active on them, in which case they go in any direction that is not towards you.  
+ * Function : checkBasicVision (previously called 'intelligence') 
+ * Meta: Gives the ghosts a bit of thinking power. If there's a clear line between them and you, 
+ *      this function will change their direction to move towards you, unless a powerpill is 
+ *      active on them, in which case they go in any direction that is not towards you.  
 */
-
-function intelligence(g){
+function checkBasicVision(g){
 	//status=(wg + "-" + wg + "--" + pacTop)
 	if (leftG[wg] == pacLeft) {// if left is equal
-	if (topG[wg] < pacTop) {// ghost < pac
-	changedir=true
-	for (v=topG[wg];v<pacTop;v=(v+10)){
-		//newdatabit = eval ("mazedata[" + v + "].left" + pacLeft)
-		newdatabit = mazedata[v][pacLeft];
-		//console.log(v,pacLeft);
-		//console.log(mazedata[v][pacLeft]);
-		//console.log(newdatabit);
-		//console.log(mazedata);
-		if (!newdatabit || newdatabit.charAt(1) != "D") changedir=false
-	}//for j
-	if (changedir && ppTimer =="0"){ ghostDir[wg] = "D"} else if (changedir && ppTimer >="1" && vulnerable[wg]) {getTrueDir(wg,"D")} else if (changedir && ppTimer >="1" && !vulnerable[wg]) { ghostDir[wg] = "D"}
-	} else {
-	if (topG[wg] > pacTop) {// ghost > pac
-		changedir=true
-		for (v=pacTop;v<topG[wg];v=(v+10)){
-		//newdatabit = eval ("mazedata[" + v + "].left" + pacLeft)
-		newdatabit = mazedata[v][pacLeft]
-		if (newdatabit && newdatabit.charAt(0) != "U") changedir=false
-		}//for j
-		if (changedir && ppTimer == "0"){ ghostDir[wg] = "U"} else if (changedir && ppTimer >="1" && vulnerable[wg]) {getTrueDir(wg,"U")} else if (changedir && ppTimer >="1" && !vulnerable[wg]) { ghostDir[wg] = "U"}
-	}//if topG gtr than pacTop
-	}//if topG less than pacTop
+		if (topG[wg] < pacTop) {// ghost < pac
+			changedir=true
+			for (v=topG[wg];v<pacTop;v=(v+10)){
+				//newdatabit = eval ("mazedata[" + v + "].left" + pacLeft)
+				newdatabit = mazedata[v][pacLeft];
+				//console.log(v,pacLeft);
+				//console.log(mazedata[v][pacLeft]);
+				//console.log(newdatabit);
+				//console.log(mazedata);
+				if (!newdatabit || newdatabit.charAt(1) != "D") changedir=false
+			}//for j
+			if (changedir && ppTimer =="0"){ ghostDir[wg] = "D"} else if (changedir && ppTimer >="1" && vulnerable[wg]) {getBasicVisionDir(wg,"D")} else if (changedir && ppTimer >="1" && !vulnerable[wg]) { ghostDir[wg] = "D"}
+		} else {
+			if (topG[wg] > pacTop) {// ghost > pac
+				changedir=true
+				for (v=pacTop;v<topG[wg];v=(v+10)){
+				//newdatabit = eval ("mazedata[" + v + "].left" + pacLeft)
+				newdatabit = mazedata[v][pacLeft]
+				if (newdatabit && newdatabit.charAt(0) != "U") changedir=false
+				}//for j
+				if (changedir && ppTimer == "0"){ ghostDir[wg] = "U"} else if (changedir && ppTimer >="1" && vulnerable[wg]) {getBasicVisionDir(wg,"U")} else if (changedir && ppTimer >="1" && !vulnerable[wg]) { ghostDir[wg] = "U"}
+			}//if topG gtr than pacTop
+		}//if topG less than pacTop
 	}// if eq left
-	if (topG[wg] == pacTop) {// if vertical is equal
-	if (leftG[wg] < pacLeft) {// if ghost < pac
-	changedir=true
-	for (v=leftG[wg];v<pacLeft;v=(v+10)){
-	//newdatabit = eval ("mazedata[pacTop].left" + v)
-	newdatabit = mazedata[pacTop][v]
-	if (newdatabit && newdatabit.charAt(3) != "R") changedir=false
-	}//for j
-	if (changedir && ppTimer == "0"){ ghostDir[wg] = "R" } else if (changedir && ppTimer >="1" && vulnerable[wg]) {getTrueDir(wg,"R")} else if (changedir && ppTimer >="1" && !vulnerable[wg]) { ghostDir[wg] = "R"}
-	} else {
-	if (leftG[wg] > pacLeft) {// if ghost > pac
-	changedir=true
-	for (v=pacLeft;v<leftG[wg];v=(v+10)){
-	//newdatabit = eval ("mazedata[pacTop].left" + v)
-	newdatabit = mazedata[pacTop][v];
-	if (newdatabit && newdatabit.charAt(2) != "L") changedir=false
-	}//for j
-	if (changedir && ppTimer == "0"){ ghostDir[wg] = "L" } else if (changedir && ppTimer >="1" && vulnerable[wg]) {getTrueDir(wg,"L")} else if (changedir && ppTimer >="1" && !vulnerable[wg]) { ghostDir[wg] = "L" }
-	}
 
-	}// if eq top
+	if (topG[wg] == pacTop) {// if vertical is equal
+		if (leftG[wg] < pacLeft) {// if ghost < pac
+			changedir=true
+			for (v=leftG[wg];v<pacLeft;v=(v+10)){
+				//newdatabit = eval ("mazedata[pacTop].left" + v)
+				newdatabit = mazedata[pacTop][v]
+				if (newdatabit && newdatabit.charAt(3) != "R") changedir=false
+			}//for j
+			if (changedir && ppTimer == "0"){ ghostDir[wg] = "R" } else if (changedir && ppTimer >="1" && vulnerable[wg]) {getBasicVisionDir(wg,"R")} else if (changedir && ppTimer >="1" && !vulnerable[wg]) { ghostDir[wg] = "R"; }
+		} else {
+			if (leftG[wg] > pacLeft) {// if ghost > pac
+			changedir=true
+			for (v=pacLeft;v<leftG[wg];v=(v+10)){
+				//newdatabit = eval ("mazedata[pacTop].left" + v)
+				newdatabit = mazedata[pacTop][v];
+				if (newdatabit && newdatabit.charAt(2) != "L") changedir=false
+			}//for j
+			if (changedir && ppTimer == "0"){ ghostDir[wg] = "L" } else if (changedir && ppTimer >="1" && vulnerable[wg]) {getBasicVisionDir(wg,"L")} else if (changedir && ppTimer >="1" && !vulnerable[wg]) { ghostDir[wg] = "L" }
+			}
+
+		}// if eq top
 	}// for i
 
 	//status bar for de-buging
 	//status = pacLeft + "-" + pacTop + ":" + ifpil + "~~~" + pilcount + "^^^^" + topG[0] + "-" + topG[1] + "-" + topG[2] + "-" + topG[3] + ":::" + newdatabit.length + "****" + keycount
 }
 
-// flash maze at end of level. Also should kill the move timeouts here really
+/*
+ * Function: levelEnd
+ * Meta: Flash maze at end of level, and call the loadLevel function to load up the next level.
+*/
 function levelEnd(){
 
 	pilcount=0;
@@ -877,8 +965,12 @@ function levelEnd(){
 	}
 }
 
+/* 
+ * Function: dynLoader
+ * Meta: for dynamically loading another javascript and following up with a callback
+*/
 function dynLoader(url, callback){
-    // Adding the script tag to the head as suggested before
+    // Adding the script tag to the head
     var head = document.getElementsByTagName('head')[0];
     var script = document.createElement('script');
     script.type = 'text/javascript';
@@ -893,6 +985,11 @@ function dynLoader(url, callback){
     head.appendChild(script);
 }
 
+/* 
+ * Lambda function: startNewLevel
+ * Called as: Callback
+ * Meta: Renders the new maze, resets the timer, resets the sprite positions and calls start (to show the next level message and kick off the timers) 
+*/
 var startNewLevel = function (){
 	mazedata = renderGrid();
 	onPause=1;
@@ -900,10 +997,20 @@ var startNewLevel = function (){
 	reset();
 	start();
 }
+
+/* Lambda function: renderNewData
+ * Called as: Callback
+ * Meta: Loads maze.js after the mazedata file has been loaded, and issues a callback to startNewLevel 
+*/
 var renderNewData = function() {
 	dynLoader("js/maze.js",startNewLevel);
 }
 
+/*
+ * Function: loadLevel
+ * Param: level (int) - the number of the level being loaded
+ * Meta: Loads the mazedata file from the server, and calls renderNewData as a callback
+*/
 function loadLevel(level){
 	//eval ("location='pacman_" + sessionStorage.level + ".html'")
 	moving = false;
@@ -911,7 +1018,10 @@ function loadLevel(level){
 	dynLoader(dataFile,renderNewData);
 }
 
-
+/*
+ * Function: start
+ * Meta: At the start of each level, display the message and kick off the game timers
+*/
 function start(){
 	onPause=0;
 	document.getElementById("levelIndicator").innerHTML = "Level " + sessionStorage.level;
@@ -919,17 +1029,45 @@ function start(){
 	gameTimer = setTimeout('divStart.visibility=\'hidden\'; move(); ghosts();',messageLifetime) 
 }
 
-/* Thiknking about proper OO version */
+/* Below is simply thiknking about proper OO version and not currently used*/
+
+var ghosts_names = new Array("Blinky","Pinky","Inky","Clyde");
+var all_ghosts = new Array();
+var total_ghosts;
+
+// pacman object constructor
+var make_pacman = function(){
+	this.left=305;
+	this.top=265;
+	this.direction = "R";
+	this.lives = sessionStorage.lives;
+	this.speed = sessionStorage.speed;
+}
 
 // ghost constructor
-var ghost = function(){
-	// properties:
-	// name - blinky, pinky, inky, clyde 
+var ghost = function(name){
+	this.name = name;
 	// src - the source image can be named after the name
-	// top
-	// left
-	// current direction
-	// alive bool 1,0 - 0 will become the original onPath variable
-	// mode (chase, scatter, frightened)
+	this.left=305;
+	this.top = 195;
+	this.alive=1; // gets rid of the onPath global
+	this.mode="scatter"; // mode (chase, scatter, frightened)
+	this.leftBase=0;
+	this.direction = "U";
+	this.speed = sessionStorage.speed;
+	console.log(this.name);
+}
+
+// make four ghosts to start
+function makeGhosts(){
+	for (i=0;i<ghosts_names.length;i++){
+		all_ghosts[i] = new ghost(ghosts_names[i]);	
+	}
+	total_ghosts = ghosts_names.length;
+}
+
+function oo_start(){
+	var pacman = new make_pacman();
+	make_ghosts();
 }
 
