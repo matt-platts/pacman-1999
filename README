@@ -13,9 +13,9 @@ which is still being updated in 2021.
 
 
 =========== ORIGINAL README TEXT =================
-Just load it up in your browser and remember the old arcade games of the '80s! This has always been available on mattplatts.com/pacman, and sat on it's own url javascript-pacman.com for a few years at some point around the turn of the millennium.
-
-As javascript games got very good I decided to remove it.  
+Just load it up in your browser and remember the old arcade games of the '80s! 
+This has always been available on mattplatts.com/pacman, and sat on it's own url javascript-pacman.com for a few years at some point around the turn of the millennium. 
+As web browsers and javascript games began to get very good I decided to remove it when it became no longer up to an accesptable standard. It was, however a lot of fun! 
 
 Update 2016:
 Started having a mess with this again years down the line. Started work on generating maze via css rather than supplying backgorund graphics - you can use the speed settings page to select the css version (a work in progress).
